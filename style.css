@@ -1205,13 +1205,16 @@ figure.close-location img {
     width: 100%;
     margin: 0px;
   }
+  .map-col div#main-map {
+    height: calc(100vh - 400px) !important;
+  }
   #category-page .map-col div#main-map {
-    /* height: calc(100vh - 400px) !important; */
     height: 50vh !important;
   }
-
+  .map-col div#search-map {
+    height: calc(100vh - 400px) !important;
+  }
   #category-page .map-col div#search-map {
-    /* height: calc(100vh - 400px) !important; */
     height: 50vh !important;
   }
   .map-col div#main-map.media-map {
