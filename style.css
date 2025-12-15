@@ -369,7 +369,8 @@ a.service_cat_list_details {
   color: #fff;
 }
 .service_cat_list:nth-child(1) {
-  background: #c94c08;
+  /* background: #c94c08; */
+  background: red;
 }
 
 .service_cat_list:nth-child(2) {
