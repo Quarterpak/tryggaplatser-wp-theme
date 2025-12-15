@@ -1145,9 +1145,6 @@ figure.close-location img {
     padding: 15px !important;
     order: 1;
   }
-  .map-col.map-col-listing {
-    display: none;
-  }
   .menu-col.menu-col-listing {
     min-height: calc(100vh - 47px);
   }
