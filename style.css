@@ -1203,11 +1203,13 @@ figure.close-location img {
     margin: 0px;
   }
   .map-col div#main-map {
-    height: calc(100vh - 400px) !important;
+    /* height: calc(100vh - 400px) !important; */
+    height: 50vh !important;
   }
 
   .map-col div#search-map {
-    height: calc(100vh - 400px) !important;
+    /* height: calc(100vh - 400px) !important; */
+    height: 50vh !important;
   }
   .map-col div#main-map.media-map {
     height: calc(100vh - 115px) !important;
@@ -1378,7 +1380,7 @@ figure.close-location img {
   }
 }
 @media only screen and (max-width: 375px) {
-  .map-col div#main-map {
+  /* .map-col div#main-map {
     height: calc(100vh - 200px) !important;
-  }
+  } */
 }
