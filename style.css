@@ -1354,6 +1354,10 @@ figure.close-location img {
   div#search-results {
     margin: 0px !important;
   }
+
+  #homepage .menu-col {
+    height: 100% !important;
+  }
 }
 
 @supports (-webkit-touch-callout: none) {
