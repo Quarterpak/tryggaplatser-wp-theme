@@ -121,7 +121,7 @@ function get_post_groups_schedule($post_id) {
  */
 function get_service_image($post_id, $cat_slug) {
     if ($cat_slug == "hygien") {
-        return "https://tryggaplatser.nu/wp-content/uploads/2025/11/stockholms-stad-logo-png_seeklogo-402794-1.png";
+        return "/wp-content/uploads/2025/11/stockholms-stad-logo-png_seeklogo-402794-1.png";
     }
     return get_the_post_thumbnail_url($post_id);
 }

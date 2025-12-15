@@ -6,9 +6,16 @@
  */
 
 const AppController = {
+  // Stockholm Central coordinates (fallback when no geolocation)
+  STOCKHOLM_CENTRAL_LAT: 59.33024608264878,
+  STOCKHOLM_CENTRAL_LNG: 18.058248426091545,
+
   // Cache user location
   userLat: null,
   userLng: null,
+
+  // Store original map view for homepage reset
+  originalHomepageView: null,
 
   /**
    * Initialize the application
@@ -37,6 +44,64 @@ const AppController = {
   },
 
   /**
+   * Calculate distance between two points using Haversine formula
+   *
+   * @param {number} lat1 - First latitude
+   * @param {number} lng1 - First longitude
+   * @param {number} lat2 - Second latitude
+   * @param {number} lng2 - Second longitude
+   * @returns {number} Distance in kilometers
+   */
+  calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371; // Radius of Earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  },
+
+  /**
+   * Find the location closest to a given point
+   *
+   * @param {Array} locations - Array of location objects with lat/lng or lat/long properties
+   * @param {number} refLat - Reference latitude
+   * @param {number} refLng - Reference longitude
+   * @returns {Object|null} Closest location or null if no locations
+   */
+  findClosestLocation(locations, refLat, refLng) {
+    if (!locations || locations.length === 0) return null;
+
+    let closest = null;
+    let minDistance = Infinity;
+
+    locations.forEach((location) => {
+      const locationLat = parseFloat(location.lat);
+      const locationLng = parseFloat(location.lng || location.long);
+
+      if (locationLat && locationLng) {
+        const distance = this.calculateDistance(
+          refLat,
+          refLng,
+          locationLat,
+          locationLng
+        );
+        if (distance < minDistance) {
+          minDistance = distance;
+          closest = location;
+        }
+      }
+    });
+
+    return closest;
+  },
+
+  /**
    * Setup all event listeners
    */
   setupEventListeners() {
@@ -48,6 +113,11 @@ const AppController = {
     // Category link in posts
     jQuery(document).on('click', '.category_card_link, .read-more-link', (e) =>
       this.onPostClick(e)
+    );
+
+    // Category card click to center map (when not navigating to single post)
+    jQuery(document).on('click', '.category_card', (e) =>
+      this.onCategoryCardClick(e)
     );
 
     // Back button
@@ -113,8 +183,8 @@ const AppController = {
   loadHomepage() {
     UIStateManager.showPage(UIStateManager.PAGES.HOME);
 
-    // Initialize map
-    const map = MapManager.initMap('map');
+    // Initialize main map
+    const map = MapManager.initMap('main-map');
 
     // Fetch and display markers
     DataFetcher.getAllLocations()
@@ -124,7 +194,7 @@ const AppController = {
         }
       })
       .fail(() => {
-        map.setView([59.334591, 18.06324], 12);
+        map.setView([59.33024608264878, 18.058248426091545], 12);
       });
   },
 
@@ -134,14 +204,28 @@ const AppController = {
    * @param {Array} locations - Location data
    */
   displayMarkersOnHomepage(locations) {
-    const mapId = 'map';
+    const mapId = 'main-map';
     const map = MapManager.getMap(mapId);
 
     if (this.userLat && this.userLng) {
+      // With geolocation: center on user's position
       MapManager.addUserMarker(mapId, this.userLat, this.userLng);
       map.setView([this.userLat, this.userLng], 13);
+      // Store original view for reset
+      this.originalHomepageView = {
+        lat: this.userLat,
+        lng: this.userLng,
+        zoom: 13,
+      };
     } else {
-      map.setView([59.334591, 18.06324], 12);
+      // Without geolocation: center on Stockholm Central
+      map.setView([this.STOCKHOLM_CENTRAL_LAT, this.STOCKHOLM_CENTRAL_LNG], 12);
+      // Store original view for reset
+      this.originalHomepageView = {
+        lat: this.STOCKHOLM_CENTRAL_LAT,
+        lng: this.STOCKHOLM_CENTRAL_LNG,
+        zoom: 12,
+      };
     }
 
     MapManager.addMarkersToMap(mapId, locations, (location) =>
@@ -155,6 +239,13 @@ const AppController = {
    * @param {Object} location - Location data
    */
   onMarkerClick(location) {
+    // Center map on clicked marker with zoom and animation
+    const lat = parseFloat(location.lat);
+    const lng = parseFloat(location.lng || location.long);
+    if (lat && lng) {
+      MapManager.flyTo('main-map', lat, lng, 16);
+    }
+
     UIStateManager.showLocationInfo();
     Renderer.renderLocationInfoPopup(location);
 
@@ -226,16 +317,26 @@ const AppController = {
       UIStateManager.pushHistory(UIStateManager.PAGES.CATEGORY, { catId });
     }
 
-    // Initialize category map
-    const mapId = 'category-map';
+    // Show loader
+    Renderer.showCategoryLoader();
+
+    // Initialize main map
+    const mapId = 'main-map';
     MapManager.initMap(mapId);
 
-    DataFetcher.getCategoryPosts(catId).done((response) => {
-      if (response.success && response.data.length > 0) {
-        this.displayCategoryPosts(response.data, catId);
-        this.loadCategorySubcategories(catId);
-      }
-    });
+    // Clear old markers before loading new ones
+    MapManager.clearMarkers(mapId);
+
+    DataFetcher.getCategoryPosts(catId)
+      .done((response) => {
+        if (response.success && response.data.length > 0) {
+          this.displayCategoryPosts(response.data, catId);
+          this.loadCategorySubcategories(catId);
+        }
+      })
+      .fail(() => {
+        Renderer.hideCategoryLoader();
+      });
   },
 
   /**
@@ -245,6 +346,9 @@ const AppController = {
    * @param {number} catId - Category ID
    */
   displayCategoryPosts(posts, catId) {
+    // Hide loader
+    Renderer.hideCategoryLoader();
+
     // Render posts
     Renderer.renderCategoryPosts(posts, catId);
 
@@ -253,13 +357,53 @@ const AppController = {
       Renderer.renderCategoryHeader(posts[0]);
     }
 
-    // Add markers to map
-    const mapId = 'category-map';
+    // Clear old markers and add new ones to map
+    const mapId = 'main-map';
+    MapManager.clearMarkers(mapId);
     MapManager.addMarkersToMap(mapId, posts, (post) => {
       this.movePostToTop(post.id);
     });
 
     MapManager.invalidateSize(mapId);
+
+    // Add user location marker if available
+    if (this.userLat && this.userLng) {
+      MapManager.addUserMarker(mapId, this.userLat, this.userLng);
+    }
+
+    // Determine centering behavior
+    setTimeout(() => {
+      if (this.userLat && this.userLng) {
+        // With geolocation: center on location closest to user
+        const closest = this.findClosestLocation(
+          posts,
+          this.userLat,
+          this.userLng
+        );
+        if (closest) {
+          const closestLat = parseFloat(closest.lat);
+          const closestLng = parseFloat(closest.lng || closest.long);
+          MapManager.flyTo(mapId, closestLat, closestLng, 13);
+        }
+      } else {
+        // Without geolocation: center on location closest to Stockholm Central
+        const closest = this.findClosestLocation(
+          posts,
+          this.STOCKHOLM_CENTRAL_LAT,
+          this.STOCKHOLM_CENTRAL_LNG
+        );
+        if (closest) {
+          const closestLat = parseFloat(closest.lat);
+          const closestLng = parseFloat(closest.lng || closest.long);
+          MapManager.flyTo(mapId, closestLat, closestLng, 13);
+        } else if (posts.length > 0) {
+          // Fallback to first location if no closest found
+          const firstLat = parseFloat(posts[0].lat);
+          const firstLng = parseFloat(posts[0].lng || posts[0].long);
+          MapManager.flyTo(mapId, firstLat, firstLng, 13);
+        }
+      }
+    }, 300);
 
     // Calculate distances if user location available
     // if (this.userLat && this.userLng) {
@@ -273,9 +417,6 @@ const AppController = {
     //             post.id
     //         );
     //     });
-
-    //     // Add user marker
-    //     MapManager.addUserMarker(mapId, this.userLat, this.userLng);
     // }
   },
 
@@ -327,11 +468,46 @@ const AppController = {
     );
     if (!selectedItem) return;
 
+    // Center map on this post with smooth animation
+    const lat = parseFloat(selectedItem.dataset.lat);
+    const lng = parseFloat(selectedItem.dataset.lng);
+    if (lat && lng) {
+      MapManager.flyTo('main-map', lat, lng, 16);
+    }
+
     listWrapper.prepend(selectedItem);
     selectedItem.classList.add('selected-highlight');
     setTimeout(() => {
       selectedItem.classList.remove('selected-highlight');
     }, 1500);
+  },
+
+  /**
+   * Handle category card click to center map
+   *
+   * @param {Event} e
+   */
+  onCategoryCardClick(e) {
+    // Don't interfere with link navigation
+    if (jQuery(e.target).closest('.category_card_link').length) {
+      return;
+    }
+
+    const $link = jQuery(e.currentTarget).closest('.category_card_link');
+    if (!$link.length) return;
+
+    const lat = parseFloat($link.data('lat'));
+    const lng = parseFloat($link.data('lng'));
+
+    if (lat && lng) {
+      MapManager.flyTo('category-map', lat, lng, 16);
+
+      // Scroll to top to show map better
+      const mapElement = document.getElementById('category-map');
+      if (mapElement) {
+        mapElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   },
 
   /**
@@ -379,15 +555,25 @@ const AppController = {
       UIStateManager.pushHistory(UIStateManager.PAGES.SINGLE, { postId });
     }
 
-    // Initialize map
-    const mapId = 'single-post-map';
+    // Show loader
+    Renderer.showSinglePostLoader();
+
+    // Initialize main map
+    const mapId = 'main-map';
     MapManager.initMap(mapId);
 
-    DataFetcher.getSinglePost(postId, catId).done((response) => {
-      if (response.success) {
-        this.displaySinglePost(response.data);
-      }
-    });
+    // Clear old markers before loading new ones
+    MapManager.clearMarkers(mapId);
+
+    DataFetcher.getSinglePost(postId, catId)
+      .done((response) => {
+        if (response.success) {
+          this.displaySinglePost(response.data);
+        }
+      })
+      .fail(() => {
+        Renderer.hideSinglePostLoader();
+      });
   },
 
   /**
@@ -396,6 +582,9 @@ const AppController = {
    * @param {Object} post - Post data
    */
   displaySinglePost(post) {
+    // Hide loader
+    Renderer.hideSinglePostLoader();
+
     // Render post header only if it wasn't already rendered instantly
     const $singleHeader = jQuery('#single-post-header');
     if (!$singleHeader.data('instant-rendered')) {
@@ -443,14 +632,23 @@ const AppController = {
     // Render post content
     Renderer.renderSinglePost(post);
 
-    // Add map marker
-    const mapId = 'single-post-map';
+    // Clear old markers and add new map marker
+    const mapId = 'main-map';
+    MapManager.clearMarkers(mapId);
     MapManager.addMarkersToMap(mapId, [post]);
     MapManager.invalidateSize(mapId);
 
-    // Add user marker and calculate distance
+    // Center map on service location with smooth animation
+    const lat = parseFloat(post.lat);
+    const lng = parseFloat(post.long);
+    if (lat && lng) {
+      setTimeout(() => {
+        MapManager.flyTo(mapId, lat, lng, 16);
+      }, 300);
+    }
+
+    // Calculate distance if needed
     // if (this.userLat && this.userLng) {
-    //     MapManager.addUserMarker(mapId, this.userLat, this.userLng);
     //     this.calculateAndDisplayDistance(
     //         this.userLat,
     //         this.userLng,
@@ -470,6 +668,8 @@ const AppController = {
 
     if (action.action === 'loadCategory') {
       this.loadCategory(action.catId, true);
+    } else if (action.action === 'home') {
+      this.loadHomepage();
     }
   },
 
@@ -496,6 +696,19 @@ const AppController = {
    */
   onCloseLocationInfo() {
     UIStateManager.hideLocationInfo();
+
+    // Reset map to original view if on homepage
+    if (
+      UIStateManager.currentPage === UIStateManager.PAGES.HOME &&
+      this.originalHomepageView
+    ) {
+      MapManager.flyTo(
+        'main-map',
+        this.originalHomepageView.lat,
+        this.originalHomepageView.lng,
+        this.originalHomepageView.zoom
+      );
+    }
   },
 
   /**
@@ -534,17 +747,25 @@ const AppController = {
       return;
     }
 
+    // Show loader
+    Renderer.showCategoryLoader();
+
     // Load posts for selected subcategories
-    DataFetcher.getSubcategoryPostsMultiple(selectedIds).done((response) => {
-      if (response.success) {
-        const mapId = 'category-map';
-        Renderer.renderCategoryPosts(
-          response.data,
-          localStorage.getItem('currentCatId')
-        );
-        MapManager.addMarkersToMap(mapId, response.data);
-      }
-    });
+    DataFetcher.getSubcategoryPostsMultiple(selectedIds)
+      .done((response) => {
+        Renderer.hideCategoryLoader();
+        if (response.success) {
+          const mapId = 'main-map';
+          Renderer.renderCategoryPosts(
+            response.data,
+            localStorage.getItem('currentCatId')
+          );
+          MapManager.addMarkersToMap(mapId, response.data);
+        }
+      })
+      .fail(() => {
+        Renderer.hideCategoryLoader();
+      });
   },
 
   /**

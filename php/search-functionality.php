@@ -214,7 +214,7 @@ jQuery(document).ready(function($) {
 });
 
 jQuery(document).ready(function($) {
-    const maptilerKey = "KUDg6K1DlfDHGdStiaqM";
+    const maptilerKey = "EL2zpAk6ItO5vMLp9uDf";
 
  let searchMap;
     let searchMarkers;

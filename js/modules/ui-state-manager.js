@@ -29,25 +29,52 @@ const UIStateManager = {
 
   /**
    * Show a page and hide others
+   * Move map to the active page for single map instance
    *
    * @param {string} pageType - Page type (home, category, single)
    */
   showPage(pageType) {
     jQuery('#homepage, #category-page, #single-post-page').hide();
 
+    // Get the map element
+    const mapElement = jQuery('#main-map');
+    let targetContainer;
+
     switch (pageType) {
       case this.PAGES.HOME:
         jQuery('#homepage').show();
+        targetContainer = jQuery('#homepage .map-col');
         break;
       case this.PAGES.CATEGORY:
         jQuery('#category-page').show();
+        targetContainer = jQuery('#category-page .category-col-map');
         break;
       case this.PAGES.SINGLE:
         jQuery('#single-post-page').show();
+        targetContainer = jQuery('#single-post-page .single-col-map');
         break;
     }
 
+    // Move map to the active page if it exists and target container exists
+    if (
+      mapElement.length > 0 &&
+      targetContainer &&
+      targetContainer.length > 0
+    ) {
+      if (mapElement.parent()[0] !== targetContainer[0]) {
+        // Move map to the target container
+        targetContainer.append(mapElement);
+      }
+    }
+
     this.currentPage = pageType;
+
+    // Invalidate map size after page transition to ensure proper display
+    setTimeout(() => {
+      if (typeof MapManager !== 'undefined' && MapManager.invalidateSize) {
+        MapManager.invalidateSize('main-map');
+      }
+    }, 100);
   },
 
   /**
@@ -178,7 +205,7 @@ const UIStateManager = {
    */
   showLocationInfo() {
     this.handleMobileMenuVisibility();
-    jQuery('#map').addClass('media-map');
+    jQuery('#main-map').addClass('media-map');
     jQuery('.service_cat').hide();
     jQuery('.location-info-wrap').fadeIn();
   },
@@ -197,7 +224,7 @@ const UIStateManager = {
     }
 
     jQuery('.location-info-wrap').fadeOut();
-    jQuery('#map').removeClass('media-map');
+    jQuery('#main-map').removeClass('media-map');
     jQuery('#search-map').removeClass('search-media-map');
   },
 };

@@ -392,4 +392,42 @@ const Renderer = {
       .attr('data-lat', location.lat)
       .attr('data-lang', location.lng);
   },
+
+  /**
+   * Show loader in category posts area
+   */
+  showCategoryLoader() {
+    const loaderHTML = `
+            <div class="category-posts-loader">
+                <div class="loader-spinner"></div>
+            </div>
+        `;
+    jQuery('#category-posts').html(loaderHTML);
+  },
+
+  /**
+   * Hide loader from category posts area
+   */
+  hideCategoryLoader() {
+    jQuery('#category-posts .category-posts-loader').remove();
+  },
+
+  /**
+   * Show loader in single post area
+   */
+  showSinglePostLoader() {
+    const loaderHTML = `
+            <div class="single-post-loader">
+                <div class="loader-spinner"></div>
+            </div>
+        `;
+    jQuery('#single-posts').html(loaderHTML);
+  },
+
+  /**
+   * Hide loader from single post area
+   */
+  hideSinglePostLoader() {
+    jQuery('#single-posts .single-post-loader').remove();
+  },
 };

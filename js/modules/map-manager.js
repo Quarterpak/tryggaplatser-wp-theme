@@ -216,14 +216,85 @@ const MapManager = {
    *
    * @param {string} mapId - Map container ID
    * @param {Array} bounds - Array of [lat, lng] pairs
+   * @param {boolean} animate - Whether to animate the transition
    */
-  fitBounds(mapId, bounds) {
+  fitBounds(mapId, bounds, animate = false) {
     const map = this.maps[mapId];
     if (!map || bounds.length === 0) return;
 
     const latLngBounds = L.latLngBounds(bounds);
     if (latLngBounds.isValid()) {
-      map.fitBounds(latLngBounds, { padding: [50, 50] });
+      if (animate) {
+        map.flyToBounds(latLngBounds, {
+          padding: [50, 50],
+          duration: 1.5,
+          easeLinearity: 0.25,
+        });
+      } else {
+        map.fitBounds(latLngBounds, { padding: [50, 50] });
+      }
+    }
+  },
+
+  /**
+   * Smoothly fly to bounds with animation
+   * Only animates to markers that have valid coordinates
+   * Skips animation if markers are very close together (within 500m)
+   *
+   * @param {string} mapId - Map container ID
+   * @param {Array} locations - Array of location objects with lat/lng
+   * @param {Object} userLocation - Optional user location {lat, lng} to include in bounds
+   */
+  flyToBounds(mapId, locations, userLocation = null) {
+    const map = this.maps[mapId];
+    if (!map || !locations || locations.length === 0) return;
+
+    // Filter to only valid locations with coordinates
+    const validBounds = locations
+      .map((loc) => {
+        const lat = parseFloat(loc.lat);
+        const lng = parseFloat(loc.lng || loc.long);
+        // Only include if both coordinates are valid numbers
+        return lat && lng && !isNaN(lat) && !isNaN(lng) ? [lat, lng] : null;
+      })
+      .filter((coord) => coord !== null);
+
+    // Add user location to bounds if provided
+    if (userLocation && userLocation.lat && userLocation.lng) {
+      validBounds.push([userLocation.lat, userLocation.lng]);
+    }
+
+    // Only animate if we have valid markers
+    if (validBounds.length === 0) return;
+
+    const latLngBounds = L.latLngBounds(validBounds);
+    if (!latLngBounds.isValid()) return;
+
+    // Check if markers are nearby (within ~500m - about 0.005 degrees)
+    const ne = latLngBounds.getNorthEast();
+    const sw = latLngBounds.getSouthWest();
+    const latDiff = Math.abs(ne.lat - sw.lat);
+    const lngDiff = Math.abs(ne.lng - sw.lng);
+    const areNearby = latDiff < 0.005 && lngDiff < 0.005;
+
+    // If only one marker, use flyTo with specific zoom
+    if (validBounds.length === 1) {
+      map.flyTo(validBounds[0], 16, {
+        duration: 1.5,
+        easeLinearity: 0.25,
+      });
+    } else if (areNearby) {
+      // Markers are nearby - just center without animation
+      const center = latLngBounds.getCenter();
+      map.setView(center, 15);
+    } else {
+      // Multiple markers spread out - animate to fit all in view
+      map.flyToBounds(latLngBounds, {
+        padding: [80, 80],
+        duration: 1.5,
+        easeLinearity: 0.25,
+        maxZoom: 15,
+      });
     }
   },
 
@@ -234,12 +305,54 @@ const MapManager = {
    * @param {number} lat
    * @param {number} lng
    * @param {number} zoom
+   * @param {boolean} animate - Whether to animate the transition
    */
-  setView(mapId, lat, lng, zoom = 13) {
+  setView(mapId, lat, lng, zoom = 13, animate = false) {
     const map = this.maps[mapId];
     if (map) {
-      map.setView([lat, lng], zoom);
+      if (animate) {
+        map.flyTo([lat, lng], zoom, {
+          duration: 1.5,
+          easeLinearity: 0.25,
+        });
+      } else {
+        map.setView([lat, lng], zoom);
+      }
     }
+  },
+
+  /**
+   * Smoothly fly to a location with animation
+   * Skips animation if marker is already centered
+   *
+   * @param {string} mapId - Map container ID
+   * @param {number} lat
+   * @param {number} lng
+   * @param {number} zoom - Zoom level (default 16 for closer view)
+   */
+  flyTo(mapId, lat, lng, zoom = 16) {
+    const map = this.maps[mapId];
+    if (!map) return;
+
+    const currentCenter = map.getCenter();
+    const currentZoom = map.getZoom();
+
+    // Check if marker is already centered (within small threshold ~50m)
+    const latDiff = Math.abs(currentCenter.lat - lat);
+    const lngDiff = Math.abs(currentCenter.lng - lng);
+    const isAlreadyCentered =
+      latDiff < 0.0005 && lngDiff < 0.0005 && Math.abs(currentZoom - zoom) < 1;
+
+    if (isAlreadyCentered) {
+      // Already centered, no animation needed
+      return;
+    }
+
+    // Animate to new position
+    map.flyTo([lat, lng], zoom, {
+      duration: 1.5,
+      easeLinearity: 0.25,
+    });
   },
 
   /**
