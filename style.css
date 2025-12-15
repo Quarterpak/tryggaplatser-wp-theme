@@ -1145,8 +1145,11 @@ figure.close-location img {
     padding: 15px !important;
     order: 1;
   }
-  #category-page .map-col.map-col-listing {
+  .map-col.map-col-listing {
     display: none;
+  }
+  #category-page .map-col.map-col-listing {
+    display: block;
   }
   .menu-col.menu-col-listing {
     min-height: calc(100vh - 47px);
