@@ -1539,7 +1539,3 @@ div#category-view.list-inner {
   align-items: center;
   margin-top: 0px;
 }
-
-.is-layout-flow > * {
-  margin-block-start: 0 !important;
-}
