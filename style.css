@@ -1504,7 +1504,7 @@ body {
   background-color: #e7e7e7;
 }
 
-#category-view .list-inner {
+#category-view.list-inner {
   padding: 0px;
 }
 
