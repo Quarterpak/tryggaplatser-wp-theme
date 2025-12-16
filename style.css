@@ -1433,10 +1433,8 @@ body {
 }
 
 #nav-global {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   height: var(--nav-h);
   background: #fff;
   border-bottom: 1px solid #ddd;
@@ -1455,7 +1453,8 @@ body {
 #page-layout {
   position: relative;
   height: 100vh;
-  padding-top: var(--nav-h);
+  /* padding-top: var(--nav-h); */
+  margin-top: 0 !important;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
