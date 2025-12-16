@@ -346,6 +346,7 @@ const AppController = {
    * @param {number} catId - Category ID
    */
   displayCategoryPosts(posts, catId) {
+    console.log('app-controller - displayCategoryPosts: ', posts);
     // Hide loader
     Renderer.hideCategoryLoader();
 
