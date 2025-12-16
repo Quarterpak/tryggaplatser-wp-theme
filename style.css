@@ -1081,8 +1081,11 @@ figure.close-location img {
     
 }
 }  */
+.back-btn.cat {
+  padding: 16px;
+}
 
-.cat .back-btn {
+.back-btn.cat > img {
   max-width: 20px;
 }
 .category-header-img {
