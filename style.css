@@ -1526,3 +1526,16 @@ div#category-view.list-inner {
   border-radius: 10px;
   cursor: pointer;
 }
+
+.main-logo-text {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  right: 0;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0px;
+}
