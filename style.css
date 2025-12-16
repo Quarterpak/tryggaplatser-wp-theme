@@ -1424,6 +1424,10 @@ figure.close-location img {
   --sidebar-w: 400px;
 }
 
+body {
+  overflow: hidden !important;
+}
+
 #nav-global {
   position: fixed;
   top: 0;
@@ -1471,6 +1475,7 @@ figure.close-location img {
 }
 
 #list-view {
+  margin: 0 !important;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   background: #fff;
