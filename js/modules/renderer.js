@@ -95,10 +95,13 @@ const Renderer = {
             <div class="header-archive">
                 <div class="header-archive-inr">
                     <div class="header-controls">
-                        <img src="/wp-content/uploads/2025/10/meny-white.svg" class="open-menu-cat" alt="Meny" style="cursor: pointer;">
-                        <img src="/wp-content/uploads/2025/10/back-white.svg" class="back-btn" data-cat-slug="${
-                          category.cat_slug
-                        }" alt="Tillbaka" style="cursor: pointer;">
+                        ${renderIconButton({
+                          className: 'back-btn',
+                          ariaLabel: 'Tillbaka till startsidan',
+                          imgSrc: '/wp-content/uploads/2025/12/close.png',
+                          imgAlt: 'Tillbaka',
+                          dataAttrs: { 'cat-slug': category.cat_slug },
+                        })}
                     </div>
                     <div class="header-archive-name">
                         ${
