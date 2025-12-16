@@ -1266,11 +1266,11 @@ figure.close-location img {
   }
   div#category-header,
   div#single-post-header {
+    padding: 0px !important;
     max-width: 100%;
     position: sticky;
     top: 0;
     z-index: 99;
-    height: 117px;
   }
   div#category-posts,
   div#single-posts {
