@@ -1266,7 +1266,6 @@ figure.close-location img {
   }
   div#category-header,
   div#single-post-header {
-    padding: 20px !important;
     max-width: 100%;
     position: sticky;
     top: 0;
