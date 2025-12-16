@@ -61,7 +61,7 @@ const Renderer = {
                 <div class="header-archive-inr">
                     <div class="header-controls">
                         ${renderIconButton({
-                          className: 'back-btn',
+                          className: 'back-btn cat',
                           ariaLabel: 'Tillbaka till startsidan',
                           imgSrc: '/wp-content/uploads/2025/12/close.png',
                           imgAlt: 'Tillbaka',
@@ -96,7 +96,7 @@ const Renderer = {
                 <div class="header-archive-inr">
                     <div class="header-controls">
                         ${renderIconButton({
-                          className: 'back-btn',
+                          className: 'back-btn cat',
                           ariaLabel: 'Tillbaka till startsidan',
                           imgSrc: '/wp-content/uploads/2025/12/close.png',
                           imgAlt: 'Tillbaka',
