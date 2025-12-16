@@ -1419,6 +1419,11 @@ figure.close-location img {
 
 /*---------- New layout styles ----------*/
 
+:root {
+  --nav-h: 64px;
+  --sidebar-w: 400px;
+}
+
 #nav-global {
   position: fixed;
   top: 0;
@@ -1428,6 +1433,15 @@ figure.close-location img {
   background: #fff;
   border-bottom: 1px solid #ddd;
   z-index: 20;
+}
+
+.nav-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
 #page-layout {
@@ -1454,6 +1468,17 @@ figure.close-location img {
   place-items: center;
   font-size: 20px;
   text-align: center;
+}
+
+#list-view {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+  border-top: 1px solid #ddd;
+}
+.list-inner {
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 #details-view {
