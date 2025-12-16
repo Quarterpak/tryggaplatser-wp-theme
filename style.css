@@ -1428,6 +1428,10 @@ body {
   overflow: hidden !important;
 }
 
+#page-wrapper {
+  padding: 0 !important;
+}
+
 #nav-global {
   position: fixed;
   top: 0;
