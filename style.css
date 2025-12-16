@@ -1096,6 +1096,10 @@ figure.close-location img {
   white-space: nowrap;
 }
 
+.cat-nav-wrapper {
+  display: none;
+}
+
 @media only screen and (max-width: 1200px) {
   .menu-col {
     padding: 30px 20px !important;
@@ -1117,10 +1121,6 @@ figure.close-location img {
     margin: 10px 0 0 0;
     max-width: 100%;
   }
-  div#category-header,
-  div#single-post-header {
-    padding: 20px !important;
-  }
   div#category-posts,
   div#single-posts {
     padding: 0 20px !important;
@@ -1137,6 +1137,10 @@ figure.close-location img {
 } */
 
 @media only screen and (max-width: 768px) {
+  .cat-nav-wrapper {
+    display: block;
+  }
+
   .main-head {
     background: #e7e7e7;
     position: fixed;
