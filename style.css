@@ -1494,17 +1494,16 @@ body {
   margin: 0 !important;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: #fff;
+  background: #e7e7e7;
   border-top: 1px solid #ddd;
 }
 
 .list-inner {
   padding: 16px;
   box-sizing: border-box;
-  background-color: #e7e7e7;
 }
 
-#category-view.list-inner {
+div#category-view.list-inner {
   padding: 0px !important;
 }
 
