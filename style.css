@@ -1452,7 +1452,7 @@ body {
 
 #page-layout {
   position: relative;
-  height: 100dvh;
+  height: calc(100dvh - var(--nav-h));
   /* padding-top: var(--nav-h); */
   margin-top: 0 !important;
   box-sizing: border-box;
