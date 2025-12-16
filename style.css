@@ -1469,6 +1469,9 @@ body {
 
 .overview-layout #list-view {
   flex: 0 0 auto !important;
+
+  max-height: 60vh !important; /* valfritt skydd så den inte blir för stor */
+  overflow-y: auto !important; /* scroll om den blir hög */
 }
 
 .overview-layout #map-view {
