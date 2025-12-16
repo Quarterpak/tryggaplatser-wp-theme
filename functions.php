@@ -1,10 +1,10 @@
 <?php
 function retrospect_child_enqueue_styles() {
     // Load parent theme CSS
-    wp_enqueue_style(
-        'retrospect-parent-style',
-        get_template_directory_uri() . '/style.css'
-    );
+    // wp_enqueue_style(
+    //     'retrospect-parent-style',
+    //     get_template_directory_uri() . '/style.css'
+    // );
 
     // Load child theme CSS
     wp_enqueue_style(
