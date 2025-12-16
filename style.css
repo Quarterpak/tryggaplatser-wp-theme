@@ -393,7 +393,7 @@ a.service_cat_list_details {
 }
 
 #category-posts {
-  height: calc(100vh - 200px);
+  /* height: calc(100vh - 200px); */
   overflow: auto;
 }
 

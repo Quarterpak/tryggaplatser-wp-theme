@@ -45,6 +45,7 @@ const UIStateManager = {
     switch (pageType) {
       case this.PAGES.HOME:
         jQuery('#homepage').show();
+        jQuery('#overview').show();
         targetContainer = jQuery('#homepage .map-col');
         break;
       case this.PAGES.CATEGORY:
