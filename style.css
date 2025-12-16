@@ -1501,6 +1501,7 @@ body {
 .list-inner {
   padding: 16px;
   box-sizing: border-box;
+  background-color: #e7e7e7;
 }
 
 #category-view .list-inner {
