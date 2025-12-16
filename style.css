@@ -1151,6 +1151,8 @@ figure.close-location img {
     right: 0px;
     padding: 25px 20px;
     max-width: 100%;
+
+    display: none;
   }
   form#custom-search-form {
     margin: 0px;
