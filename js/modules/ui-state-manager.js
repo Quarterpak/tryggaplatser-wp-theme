@@ -36,6 +36,7 @@ const UIStateManager = {
   showPage(pageType) {
     console.log('ui-state-manager - showPage: ', pageType);
     jQuery('#homepage, #category-page, #single-post-page').hide();
+    jQuery('#overview', '#category-view').hide();
 
     // Get the map element
     const mapElement = jQuery('#main-map');
@@ -48,6 +49,7 @@ const UIStateManager = {
         break;
       case this.PAGES.CATEGORY:
         jQuery('#category-page').show();
+        jQuery('#category-view').show();
         targetContainer = jQuery('#category-page .category-col-map');
         break;
       case this.PAGES.SINGLE:
