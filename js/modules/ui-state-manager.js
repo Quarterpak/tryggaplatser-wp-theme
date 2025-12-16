@@ -34,6 +34,7 @@ const UIStateManager = {
    * @param {string} pageType - Page type (home, category, single)
    */
   showPage(pageType) {
+    console.log('ui-state-manager - showPage: ', pageType);
     jQuery('#homepage, #category-page, #single-post-page').hide();
 
     // Get the map element
