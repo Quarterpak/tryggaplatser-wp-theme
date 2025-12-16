@@ -216,6 +216,8 @@ a.category_card_link {
   color: #0f1417 !important;
 }
 .header-archive-inr {
+  display: flex;
+  justify-content: flex-end;
   position: relative;
 }
 

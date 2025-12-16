@@ -61,10 +61,11 @@ const Renderer = {
                 <div class="header-archive-inr">
                     <div class="header-controls">
                         ${renderIconButton({
-                          className: 'open-menu-cat',
-                          ariaLabel: 'Öppna huvudmenyn',
-                          imgSrc: '/wp-content/uploads/2025/10/meny-white.svg',
-                          imgAlt: 'Meny',
+                          className: 'back-btn',
+                          ariaLabel: 'Tillbaka till startsidan',
+                          imgSrc: '/wp-content/uploads/2025/12/close.png',
+                          imgAlt: 'Tillbaka',
+                          dataAttrs: { 'cat-slug': category.cat_slug },
                         })}
                     </div>
                     <div class="header-archive-name">
@@ -74,17 +75,6 @@ const Renderer = {
                             : ''
                         }
                         <h3 class="s-cat-name">${category.cat_name}</h3>
-                    </div>
-                    <div>
-                        <div class="header-controls-right">
-                            ${renderIconButton({
-                              className: 'back-btn',
-                              ariaLabel: 'Tillbaka till startsidan',
-                              imgSrc: '/wp-content/uploads/2025/12/close.png',
-                              imgAlt: 'Tillbaka',
-                              dataAttrs: { 'cat-slug': category.cat_slug },
-                            })}
-                        </div>
                     </div>
                 </div>
             </div>
