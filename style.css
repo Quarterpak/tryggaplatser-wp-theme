@@ -1470,7 +1470,7 @@ body {
 .overview-layout #list-view {
   flex: 0 0 auto !important;
 
-  /* max-height: 60vh !important; */
+  max-height: 50vh !important;
   overflow-y: auto !important;
 }
 
