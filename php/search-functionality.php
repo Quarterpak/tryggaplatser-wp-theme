@@ -523,7 +523,7 @@ jQuery(document).ready(function($) {
                     $('.service_cat').hide();
                     $('#map').hide();
                     initSearchMap();
-                    $('#search-map').hide();
+                    // $('#search-map').hide();
 
                     let html = '<div class="search-data">';
                     response.data.forEach(post => {
