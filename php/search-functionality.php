@@ -564,7 +564,7 @@ jQuery(document).ready(function($) {
                     $('#search-results').html('<p>No results found</p>');
                     if (searchMarkers) searchMarkers.clearLayers();
                     $('#map').show();
-                    $('#search-map').hide();
+                    $('#search-map').show();
                     $('.service_cat').show();
                 }
             }
