@@ -6,11 +6,11 @@
 
 add_action('wp_footer', 'custom_search_js', 20);
 function custom_search_js() { ?>
-<!-- <style>
+<style>
   #search-map {
       display: none; 
   }
-</style> -->
+</style>
 
 <script>
 
@@ -503,7 +503,7 @@ jQuery(document).ready(function($) {
             $('#search-results').empty();
             $('.service_cat').show();
             $('#map').show();
-            // $('#search-map').hide();
+            $('#search-map').hide();
             if (searchMarkers) searchMarkers.clearLayers();
             if (searchMap) searchMap.setView([20.5937, 78.9629], 5);
             return;
@@ -523,7 +523,7 @@ jQuery(document).ready(function($) {
                     $('.service_cat').hide();
                     $('#map').hide();
                     initSearchMap();
-                    // $('#search-map').hide();
+                    $('#search-map').hide();
 
                     let html = '<div class="search-data">';
                     response.data.forEach(post => {
@@ -553,23 +553,18 @@ jQuery(document).ready(function($) {
                     });
                     html += '</div>';
                     $('#search-results').html(html);
-                    
-                    console.log("Show Search Map!");
-                    $('#search-map').show();
-                    addMarkers(response.data, searchMarkers, searchMap);
-                    searchMap.invalidateSize();
 
-                    // if (window.matchMedia("(min-width: 769px)").matches) {
-                    //     $('#search-map').show();
-                    //     addMarkers(response.data, searchMarkers, searchMap);
-                    //     searchMap.invalidateSize();
-                    // }
+                    if (window.matchMedia("(min-width: 769px)").matches) {
+                        $('#search-map').show();
+                        addMarkers(response.data, searchMarkers, searchMap);
+                        searchMap.invalidateSize();
+                    }
                 } else {
                     $(".location-info-wrap").fadeOut();
                     $('#search-results').html('<p>No results found</p>');
                     if (searchMarkers) searchMarkers.clearLayers();
                     $('#map').show();
-                    // $('#search-map').hide();
+                    $('#search-map').hide();
                     $('.service_cat').show();
                 }
             }
@@ -595,7 +590,7 @@ jQuery(document).ready(function($) {
 
     if (window.matchMedia("(max-width: 767px)").matches) {
         $(document).on('click', '.close-location.close-compact', function() {
-            // $('#search-map').hide();
+            $('#search-map').hide();
         });
     }
 });
