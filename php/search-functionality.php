@@ -503,7 +503,7 @@ jQuery(document).ready(function($) {
             $('#search-results').empty();
             $('.service_cat').show();
             $('#map').show();
-            $('#search-map').hide();
+            // $('#search-map').hide();
             if (searchMarkers) searchMarkers.clearLayers();
             if (searchMap) searchMap.setView([20.5937, 78.9629], 5);
             return;
@@ -569,7 +569,7 @@ jQuery(document).ready(function($) {
                     $('#search-results').html('<p>No results found</p>');
                     if (searchMarkers) searchMarkers.clearLayers();
                     $('#map').show();
-                    $('#search-map').hide();
+                    // $('#search-map').hide();
                     $('.service_cat').show();
                 }
             }
@@ -595,7 +595,7 @@ jQuery(document).ready(function($) {
 
     if (window.matchMedia("(max-width: 767px)").matches) {
         $(document).on('click', '.close-location.close-compact', function() {
-            $('#search-map').hide();
+            // $('#search-map').hide();
         });
     }
 });
