@@ -1662,8 +1662,8 @@ input#custom-search-input {
 
 @media only screen and (max-width: 768px) {
   a.service_cat_list_details img {
-    max-height: 30px;
-    max-width: 30px;
+    max-height: 36px;
+    max-width: 36px;
   }
   .service_cat_list p {
     font-size: 14px;
