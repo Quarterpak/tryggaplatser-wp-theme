@@ -393,7 +393,6 @@ a.service_cat_list_details {
 }
 
 #category-posts {
-  /* height: calc(100vh - 200px); */
   overflow: auto;
 }
 
@@ -1601,6 +1600,10 @@ input#custom-search-input {
     inset: 0;
     right: calc(100% - var(--sidebar-w));
     z-index: 999;
+  }
+
+  #category-posts {
+    height: calc(100vh - 200px);
   }
 
   #single-view {
