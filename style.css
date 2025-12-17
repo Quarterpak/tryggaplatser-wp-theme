@@ -1611,6 +1611,10 @@ div#single-view.list-inner {
     height: 100%;
   }
 
+  #single-posts {
+    padding-bottom: 40px;
+  }
+
   #page-wrapper.single-item-view #map-view,
   #page-wrapper.single-item-view #nav-global {
     display: unset;
