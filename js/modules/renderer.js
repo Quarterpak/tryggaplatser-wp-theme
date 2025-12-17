@@ -41,7 +41,7 @@ const Renderer = {
                           post.street_name
                         }</p>
                         <p class="category_open_data">${todayStatus}</p>
-                        <div class="h-flex-between">
+                        <div class="h-flex-between w-100">
                           <div>
                             ${repeaterHTML}
                           </div>
