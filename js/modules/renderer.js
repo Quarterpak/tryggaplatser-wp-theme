@@ -294,7 +294,69 @@ const Renderer = {
             </div>
         `;
 
-    jQuery('#single-posts').html(html);
+    const singleViewHTML = `
+            <div class="post-header-content">
+                <img src="${
+                  post.image
+                    ? post.image
+                    : 'https://tryggaplatser.nu/wp-content/uploads/2025/10/SSM_single_png.svg'
+                }"
+                      alt="Service logotyp"
+                      class="bo-logo">
+                <h1>${post.title}</h1>
+                <h2 class="single-address-data">${post.address}</h2>
+            </div>
+
+            <div class="post-content">${post.content}</div>
+
+            <div class="bo-contact">
+                ${
+                  post.service_link
+                    ? `
+                    <a class="bo-btn" href="${post.service_link}" target="_blank">
+                        <img src="/wp-content/uploads/2025/10/language.svg" alt="Website">
+                        <span>Hemsida</span>
+                    </a>
+                `
+                    : ''
+                }
+                <a class="bo-btn bo-btn-direction" data-lat="${
+                  post.lat
+                }" data-lang="${post.long}">
+                    <img src="/wp-content/uploads/2025/10/directions-1.svg" alt="Directions">
+                    <span>Vägbeskrivning</span>
+                </a>
+            </div>
+
+            ${
+              todayStatus
+                ? `
+                <div class="post-contact-details">
+                    <img src="/wp-content/uploads/2025/10/schedule.svg" alt="">
+                    <div class="post-content-data">
+                        <p class="category_open">${todayStatus}</p>
+                        ${openingHoursHtml}
+                    </div>
+                </div>
+            `
+                : ''
+            }
+
+            ${repeaterHTML}
+
+            ${
+              post.service_category_html
+                ? `
+                <div class="service-tags">
+                    <p class="service-tagp-heading">Denna plats är ämnad för:</p>
+                    ${post.service_category_html}
+                </div>
+            `
+                : ''
+            }
+    `;
+
+    jQuery('#single-posts').html(singleViewHTML);
   },
 
   /**
