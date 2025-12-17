@@ -1610,4 +1610,13 @@ div#single-view.list-inner {
   .service-cat {
     height: 100%;
   }
+
+  #page-wrapper.single-item-view #map-view,
+  #page-wrapper.single-item-view #nav-global {
+    display: unset;
+  }
+
+  #page-layout.single-item-view #map-view {
+    display: unset;
+  }
 }
