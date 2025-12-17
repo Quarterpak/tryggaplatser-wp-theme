@@ -1421,123 +1421,111 @@ figure.close-location img {
 
 /*---------- New layout styles ----------*/
 
+/* =========================
+   App layout (WP safe)
+   ========================= */
+
 :root {
   --nav-h: 64px;
   --sidebar-w: 400px;
+  --map-ratio: 50%;
+  --list-ratio: 50%;
 }
 
+/* 1) Stoppa "page scroll" helt */
+html,
 body {
-  overflow: hidden !important;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
+/* 2) WP wrappers: inga extra paddings/margins som skapar overflow */
+.wp-site-blocks,
 #page-wrapper {
+  height: 100dvh;
+  overflow: hidden;
   padding: 0 !important;
+  margin: 0 !important;
 }
 
+/* 3) Navbar (sticky, tar plats i flow) */
 #nav-global {
   position: sticky;
   top: 0;
   height: var(--nav-h);
   background: #e7e7e7;
-  /* border-bottom: 1px solid #ddd; */
   z-index: 20;
 }
 
-.nav-inner {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  box-sizing: border-box;
-}
-
+/* 4) Layout-ytan under navbar */
 #page-layout {
   position: relative;
   height: calc(100dvh - var(--nav-h));
-  /* padding-top: var(--nav-h); */
-  margin-top: 0 !important;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* aldrig scroll här */
+  min-height: 0; /* viktigt för nested scroll */
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
 }
 
-#map-view,
-#list-view {
-  flex: 0 0 50%;
-}
-
-.overview-layout #list-view {
-  flex: 0 0 auto !important;
-
-  max-height: 50vh !important;
-  overflow-y: auto !important;
-}
-
-.overview-layout #map-view {
-  flex: 1 1 auto !important;
-}
-
+/* 5) Mobile: karta + lista i ratio (default 50/50) */
 #map-view {
-  overflow: hidden;
+  flex: 0 0 var(--map-ratio);
+  overflow: hidden; /* kartan ska inte scrolla */
+  min-height: 0;
   background: #e5e5e5;
 }
-.map-inner {
-  height: 100%;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  text-align: center;
-}
 
 #list-view {
-  margin: 0 !important;
-  overflow-y: auto;
+  flex: 0 0 var(--list-ratio);
+  overflow-y: auto; /* ENDA scrollen */
+  min-height: 0;
   -webkit-overflow-scrolling: touch;
   background: #e7e7e7;
+  margin: 0 !important;
 }
 
+/* Inre padding i listan (lägg på wrapper, inte på själva list-view) */
 .list-inner {
   padding: 16px;
   box-sizing: border-box;
 }
 
-div#category-view.list-inner {
-  padding: 0px !important;
-}
-div#single-view.list-inner {
-  padding: 0px !important;
-}
-
-#category-view {
-  margin-top: 0px !important;
+/* Om du behöver noll-padding för vissa views */
+#category-view.list-inner,
+#single-view.list-inner {
+  padding: 0 !important;
 }
 
-#single-view {
-  /* display: none; */
-  margin-top: 0px !important;
-  /* background: #fff;
-  z-index: 50; */
-}
+/* =========================
+   Desktop: två kolumner
+   lista vänster 400px, karta resten
+   ========================= */
+@media (min-width: 992px) {
+  #page-layout {
+    height: 100dvh; /* på desktop kan layouten gå hela vägen upp */
+    flex-direction: row;
+  }
 
-.list-row {
-  width: 100%;
-  text-align: left;
-  padding: 12px;
-  background: #fff;
-  border-radius: 10px;
-  cursor: pointer;
-}
+  /* Navbar bara över listkolumnen */
+  #nav-global {
+    width: var(--sidebar-w);
+    border-right: 1px solid #ddd;
+  }
 
-.main-logo-text {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  right: 0;
-  bottom: 0;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 0px;
+  /* Lista vänster */
+  #list-view {
+    flex: 0 0 var(--sidebar-w);
+    height: 100%;
+    border-right: 1px solid #ddd;
+  }
+
+  /* Karta höger */
+  #map-view {
+    flex: 1 1 auto;
+    height: 100%;
+  }
 }
