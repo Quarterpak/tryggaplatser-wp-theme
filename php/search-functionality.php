@@ -555,8 +555,8 @@ jQuery(document).ready(function($) {
                     $('#search-results').html(html);
 
                     $('#search-map').show();
-                    addMarkers(response.data, searchMarkers, searchMap);
-                    searchMap.invalidateSize();
+                        addMarkers(response.data, searchMarkers, searchMap);
+                        searchMap.invalidateSize();
 
                     // if (window.matchMedia("(min-width: 769px)").matches) {
                     //     $('#search-map').show();
