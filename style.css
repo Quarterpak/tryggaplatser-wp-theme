@@ -1553,6 +1553,10 @@ div#single-view.list-inner {
   margin-top: 0px;
 }
 
+input#custom-search-input {
+  width: 100%;
+}
+
 /* =========================
    Desktop: två kolumner
    lista vänster 400px, karta resten
