@@ -594,13 +594,6 @@ const AppController = {
                     <div class="header-archive-inr">
                         <div class="header-controls">
                             ${renderIconButton({
-                              className: 'open-menu-cat',
-                              ariaLabel: 'Öppna huvudmenyn',
-                              imgSrc:
-                                '/wp-content/uploads/2025/10/meny-white.svg',
-                              imgAlt: 'Meny',
-                            })}
-                            ${renderIconButton({
                               className: 'back-btn',
                               ariaLabel: 'Tillbaka till kategori',
                               imgSrc:
