@@ -1561,6 +1561,8 @@ div#single-view.list-inner {
   #page-layout {
     height: 100dvh; /* på desktop kan layouten gå hela vägen upp */
     flex-direction: row;
+
+    position: static;
   }
 
   /* Navbar bara över listkolumnen */
@@ -1584,5 +1586,11 @@ div#single-view.list-inner {
     order: 1;
     flex: 1 1 auto;
     height: 100%;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: var(--sidebar-w);
   }
 }
