@@ -820,6 +820,7 @@ a.service_cat_list_details br,
 
 /* Card */
 .category_card {
+  position: relative;
   background: #fff;
   border-radius: 12px;
   padding: 12px 15px;
@@ -1556,9 +1557,15 @@ input#custom-search-input {
   width: 100%;
 }
 
+.card-chevron-wrapper {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+}
+
 .chevron {
-  width: 1em;
-  height: 1em;
+  width: 24px;
+  height: 24px;
   display: inline-block;
   vertical-align: middle;
 }
@@ -1566,6 +1573,10 @@ input#custom-search-input {
 .h-flex-between {
   display: flex;
   justify-content: space-between;
+}
+
+.w-100 {
+  width: 100%;
 }
 
 /* =========================
