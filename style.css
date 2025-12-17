@@ -1588,10 +1588,19 @@ div#single-view.list-inner {
     height: 100%;
 
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     left: var(--sidebar-w);
+  }
+
+  #category-view {
+    position: absolute;
+    inset: 0;
+    right: calc(100% - var(--sidebar-w));
+    z-index: 999;
+  }
+
+  #single-view {
+    right: calc(100% - var(--sidebar-w));
   }
 
   #overview {
