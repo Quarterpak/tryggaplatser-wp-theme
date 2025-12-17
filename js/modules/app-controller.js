@@ -594,7 +594,7 @@ const AppController = {
                     <div class="header-archive-inr">
                         <div class="header-controls">
                             ${renderIconButton({
-                              className: 'back-btn',
+                              className: 'back-btn cat',
                               ariaLabel: 'Tillbaka till kategori',
                               imgSrc:
                                 '/wp-content/uploads/2025/10/back-white.svg',
