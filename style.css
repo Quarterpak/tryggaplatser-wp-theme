@@ -1510,8 +1510,8 @@ div#category-view.list-inner {
   margin-top: 0px !important;
 }
 
-#details-view {
-  display: none;
+#single-view {
+  /* display: none; */
   background: #fff;
   z-index: 50;
 }
