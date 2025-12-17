@@ -41,11 +41,8 @@ const Renderer = {
                           post.street_name
                         }</p>
                         <p class="category_open_data">${todayStatus}</p>
-                        <div class="h-flex-between w-100">
-                          <div>
-                            ${repeaterHTML}
-                          </div>
-                          <div>
+                        ${repeaterHTML}
+                        <div class="card-chevron-wrapper">
                             <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
                               <path d="M9 6l6 6-6 6"
                                     fill="none"
@@ -54,7 +51,6 @@ const Renderer = {
                                     stroke-linecap="round"
                                     stroke-linejoin="round"/>
                             </svg>
-                          </div>
                         </div>
                     </div>
                 </a>
