@@ -1515,8 +1515,9 @@ div#single-view.list-inner {
 
 #single-view {
   /* display: none; */
-  background: #fff;
-  z-index: 50;
+  margin-top: 0px !important;
+  /* background: #fff;
+  z-index: 50; */
 }
 
 .list-row {
