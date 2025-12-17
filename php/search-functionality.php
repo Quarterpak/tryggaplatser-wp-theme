@@ -553,10 +553,11 @@ jQuery(document).ready(function($) {
                     });
                     html += '</div>';
                     $('#search-results').html(html);
-
+                    
+                    console.log("Show Search Map!");
                     $('#search-map').show();
-                        addMarkers(response.data, searchMarkers, searchMap);
-                        searchMap.invalidateSize();
+                    addMarkers(response.data, searchMarkers, searchMap);
+                    searchMap.invalidateSize();
 
                     // if (window.matchMedia("(min-width: 769px)").matches) {
                     //     $('#search-map').show();
