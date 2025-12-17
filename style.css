@@ -1525,13 +1525,8 @@ div#single-view.list-inner {
   background: #e7e7e7;
 }
 
-#page-layout.single-layout .list-row {
-  width: 100%;
-  text-align: left;
-  padding: 12px;
-  background: #fff;
-  border-radius: 10px;
-  cursor: pointer;
+#page-layout.single-item-view #map-view {
+  display: none;
 }
 
 .main-logo-text {

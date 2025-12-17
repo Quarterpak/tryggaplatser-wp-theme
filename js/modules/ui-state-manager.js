@@ -37,6 +37,7 @@ const UIStateManager = {
     console.log('ui-state-manager - showPage: ', pageType);
     jQuery('#homepage, #category-page, #single-post-page').hide();
     jQuery('#overview, #category-view, #single-view').hide();
+    jQuery('#page-layout').removeClass('single-item-view');
 
     // Get the map element
     const mapElement = jQuery('#main-map');
@@ -58,6 +59,7 @@ const UIStateManager = {
       case this.PAGES.SINGLE:
         jQuery('#single-post-page').show();
         jQuery('#single-view').show();
+        jQuery('#page-layout').addClass('single-item-view');
         // targetContainer = jQuery('#single-post-page .single-col-map');
         targetContainer = jQuery('#map-view .map-inner');
         break;
