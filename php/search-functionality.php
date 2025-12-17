@@ -6,11 +6,11 @@
 
 add_action('wp_footer', 'custom_search_js', 20);
 function custom_search_js() { ?>
-<style>
+<!-- <style>
   #search-map {
       display: none; 
   }
-</style>
+</style> -->
 
 <script>
 
