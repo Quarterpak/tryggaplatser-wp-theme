@@ -991,7 +991,7 @@ p.category_open {
   font-weight: 500 !important;
 }
 div#single-posts {
-  height: calc(100vh - 209px);
+  /* height: calc(100vh - 209px); */
   overflow: auto;
 }
 .tag {
@@ -1522,10 +1522,10 @@ div#single-view.list-inner {
   right: 0;
   bottom: 0;
   z-index: 999;
-  background: white;
+  background: #e7e7e7;
 }
 
-.list-row {
+#page-layout.single-layout .list-row {
   width: 100%;
   text-align: left;
   padding: 12px;
