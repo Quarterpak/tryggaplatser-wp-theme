@@ -1443,8 +1443,8 @@ body {
   z-index: 20;
 }
 
-#pagewrapper.single-item-view #map-view,
-#nav-global {
+#page-wrapper.single-item-view #map-view,
+#page-wrapper.single-item-view #nav-global {
   display: none;
 }
 
