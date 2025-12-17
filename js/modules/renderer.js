@@ -149,11 +149,35 @@ const Renderer = {
             </div>
         `;
 
+    const singleHeaderHTML = `
+            <div class="header-archive">
+                <div class="header-archive-inr">
+                    <div class="header-controls">
+                        ${renderIconButton({
+                          className: 'back-btn cat',
+                          ariaLabel: 'Tillbaka till startsidan',
+                          imgSrc: '/wp-content/uploads/2025/12/close.png',
+                          imgAlt: 'Tillbaka',
+                          dataAttrs: { 'cat-slug': data.cat_slug },
+                        })}
+                    </div>
+                    <div class="header-archive-name">
+                        ${
+                          data.cat_image
+                            ? `<img src="${data.cat_image}" class="category-header-img" loading="eager" decoding="sync" />`
+                            : ''
+                        }
+                        <h3 class="s-cat-name">${data.cat_name}</h3>
+                    </div>
+                </div>
+            </div>
+        `;
+
     const $header = jQuery('#single-post-header');
     $header
       .removeClass()
       .addClass(data.cat_slug || '')
-      .html(catHTML);
+      .html(singleHeaderHTML);
     // mark so AJAX won't override
     $header.data('instant-rendered', true);
   },
