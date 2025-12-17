@@ -128,27 +128,6 @@ const Renderer = {
    * @param {Object} data - Data from link attributes
    */
   renderSingleHeaderInstant(data) {
-    const catHTML = `
-            <div class="header-archive">
-                <div class="header-archive-inr">
-                    <div class="header-controls">
-                        <img src="/wp-content/uploads/2025/10/meny-white.svg" class="open-menu-cat" alt="Meny" style="cursor: pointer;">
-                        <img src="/wp-content/uploads/2025/10/back-white.svg" class="back-btn" data-cat-slug="${
-                          data.cat_slug || ''
-                        }" alt="Tillbaka" style="cursor: pointer;">
-                    </div>
-                    <div class="header-archive-name">
-                        ${
-                          data.cat_image
-                            ? `<img src="${data.cat_image}" class="category-header-img" loading="eager" decoding="sync" />`
-                            : ''
-                        }
-                        <h3 class="s-cat-name">${data.cat_name || ''}</h3>
-                    </div>
-                </div>
-            </div>
-        `;
-
     const singleHeaderHTML = `
             <div class="header-archive">
                 <div class="header-archive-inr">
