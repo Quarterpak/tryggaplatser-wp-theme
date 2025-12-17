@@ -554,17 +554,21 @@ jQuery(document).ready(function($) {
                     html += '</div>';
                     $('#search-results').html(html);
 
-                    if (window.matchMedia("(min-width: 769px)").matches) {
-                        $('#search-map').show();
-                        addMarkers(response.data, searchMarkers, searchMap);
-                        searchMap.invalidateSize();
-                    }
+                    $('#search-map').show();
+                    addMarkers(response.data, searchMarkers, searchMap);
+                    searchMap.invalidateSize();
+
+                    // if (window.matchMedia("(min-width: 769px)").matches) {
+                    //     $('#search-map').show();
+                    //     addMarkers(response.data, searchMarkers, searchMap);
+                    //     searchMap.invalidateSize();
+                    // }
                 } else {
                     $(".location-info-wrap").fadeOut();
                     $('#search-results').html('<p>No results found</p>');
                     if (searchMarkers) searchMarkers.clearLayers();
                     $('#map').show();
-                    $('#search-map').show();
+                    $('#search-map').hide();
                     $('.service_cat').show();
                 }
             }
