@@ -1594,7 +1594,11 @@ div#single-view.list-inner {
     left: var(--sidebar-w);
   }
 
+  #overview {
+    height: 100%;
+  }
+
   .service-cat {
-    height: calc(100vh - var(--nav-h));
+    height: 100%;
   }
 }
