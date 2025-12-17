@@ -1438,8 +1438,8 @@ body {
   position: sticky;
   top: 0;
   height: var(--nav-h);
-  background: #fff;
-  border-bottom: 1px solid #ddd;
+  background: #e7e7e7;
+  /* border-bottom: 1px solid #ddd; */
   z-index: 20;
 }
 
@@ -1470,8 +1470,8 @@ body {
 .overview-layout #list-view {
   flex: 0 0 auto !important;
 
-  max-height: 60vh !important; /* valfritt skydd så den inte blir för stor */
-  overflow-y: auto !important; /* scroll om den blir hög */
+  /* max-height: 60vh !important; */
+  overflow-y: auto !important;
 }
 
 .overview-layout #map-view {
@@ -1495,7 +1495,6 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   background: #e7e7e7;
-  border-top: 1px solid #ddd;
 }
 
 .list-inner {
@@ -1521,7 +1520,6 @@ div#category-view.list-inner {
   width: 100%;
   text-align: left;
   padding: 12px;
-  border: 1px solid #eee;
   background: #fff;
   border-radius: 10px;
   cursor: pointer;
