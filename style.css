@@ -1593,4 +1593,8 @@ div#single-view.list-inner {
     bottom: 0;
     left: var(--sidebar-w);
   }
+
+  .service-cat {
+    height: calc(100vh - var(--nav-h));
+  }
 }
