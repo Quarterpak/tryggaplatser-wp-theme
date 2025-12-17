@@ -36,7 +36,7 @@ const UIStateManager = {
   showPage(pageType) {
     console.log('ui-state-manager - showPage: ', pageType);
     jQuery('#homepage, #category-page, #single-post-page').hide();
-    jQuery('#overview, #category-view').hide();
+    jQuery('#overview, #category-view, #single-view').hide();
 
     // Get the map element
     const mapElement = jQuery('#main-map');
@@ -46,16 +46,20 @@ const UIStateManager = {
       case this.PAGES.HOME:
         jQuery('#homepage').show();
         jQuery('#overview').show();
-        targetContainer = jQuery('#homepage .map-col');
+        // targetContainer = jQuery('#homepage .map-col');
+        targetContainer = jQuery('#map-view .map-inner');
         break;
       case this.PAGES.CATEGORY:
         jQuery('#category-page').show();
         jQuery('#category-view').show();
-        targetContainer = jQuery('#category-page .category-col-map');
+        // targetContainer = jQuery('#category-page .category-col-map');
+        targetContainer = jQuery('#map-view .map-inner');
         break;
       case this.PAGES.SINGLE:
         jQuery('#single-post-page').show();
-        targetContainer = jQuery('#single-post-page .single-col-map');
+        jQuery('#single-view').show();
+        // targetContainer = jQuery('#single-post-page .single-col-map');
+        targetContainer = jQuery('#map-view .map-inner');
         break;
     }
 
