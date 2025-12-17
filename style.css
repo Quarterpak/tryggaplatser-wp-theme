@@ -1443,6 +1443,11 @@ body {
   z-index: 20;
 }
 
+#pagewrapper.single-item-view #map-view,
+#nav-global {
+  display: none;
+}
+
 .nav-inner {
   height: 100%;
   display: flex;
