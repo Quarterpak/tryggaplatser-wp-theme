@@ -39,6 +39,7 @@ const UIStateManager = {
     jQuery('#overview, #category-view, #single-view').hide();
     jQuery('#page-layout').removeClass('single-item-view');
     jQuery('#page-wrapper').removeClass('single-item-view');
+    jQuery('body').removeClass('single-item-view');
 
     // Get the map element
     const mapElement = jQuery('#main-map');
@@ -62,6 +63,7 @@ const UIStateManager = {
         jQuery('#single-view').show();
         jQuery('#page-layout').addClass('single-item-view');
         jQuery('#page-wrapper').addClass('single-item-view');
+        jQuery('body').addClass('single-item-view');
         // targetContainer = jQuery('#single-post-page .single-col-map');
         targetContainer = jQuery('#map-view .map-inner');
         break;

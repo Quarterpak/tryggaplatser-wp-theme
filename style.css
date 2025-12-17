@@ -1443,8 +1443,16 @@ body {
   z-index: 20;
 }
 
+body.single-item-view #gt-wrapper-55124122 {
+  display: none;
+}
+
 #page-wrapper.single-item-view #map-view,
 #page-wrapper.single-item-view #nav-global {
+  display: none;
+}
+
+#page-layout.single-item-view #map-view {
   display: none;
 }
 
@@ -1530,10 +1538,6 @@ div#single-view.list-inner {
   bottom: 0;
   z-index: 999;
   background: white;
-}
-
-#page-layout.single-item-view #map-view {
-  display: none;
 }
 
 .main-logo-text {
