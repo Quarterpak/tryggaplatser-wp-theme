@@ -1423,7 +1423,7 @@ figure.close-location img {
 
 :root {
   --nav-h: 64px;
-  --sidebar-w: 400px;
+  --sidebar-w: 470px;
 }
 
 body {
@@ -1571,13 +1571,17 @@ div#single-view.list-inner {
 
   /* Lista vänster */
   #list-view {
-    flex: 0 0 var(--sidebar-w);
+    order: 0;
+    flex: 0 0 var(--sidebar-w) !important;
     height: 100%;
     border-right: 1px solid #ddd;
+
+    max-height: 100% !important;
   }
 
   /* Karta höger */
   #map-view {
+    order: 1;
     flex: 1 1 auto;
     height: 100%;
   }
