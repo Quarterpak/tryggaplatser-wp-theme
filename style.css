@@ -1505,6 +1505,9 @@ body {
 div#category-view.list-inner {
   padding: 0px !important;
 }
+div#single-view.list-inner {
+  padding: 0px !important;
+}
 
 #category-view {
   margin-top: 0px !important;
