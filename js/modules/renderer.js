@@ -41,7 +41,21 @@ const Renderer = {
                           post.street_name
                         }</p>
                         <p class="category_open_data">${todayStatus}</p>
-                        ${repeaterHTML}
+                        <div class="h-flex-between">
+                          <div>
+                            ${repeaterHTML}
+                          </div>
+                          <div>
+                            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M9 6l6 6-6 6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"/>
+                            </svg>
+                          </div>
+                        </div>
                     </div>
                 </a>
             `;
