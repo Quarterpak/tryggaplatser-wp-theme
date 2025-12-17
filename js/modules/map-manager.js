@@ -18,6 +18,7 @@ const MapManager = {
    * @returns {L.Map} Leaflet map instance
    */
   initMap(containerId, options = {}) {
+    console.log('map-manager - initMap containerId: ', containerId);
     if (this.maps[containerId]) {
       return this.maps[containerId];
     }
