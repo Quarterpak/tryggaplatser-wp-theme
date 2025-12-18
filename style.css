@@ -1600,6 +1600,10 @@ input#custom-search-input {
     border-right: 1px solid #ddd;
   }
 
+  body.cat-view #nav-global {
+    display: none;
+  }
+
   /* Lista vänster */
   #list-view {
     order: 0;
