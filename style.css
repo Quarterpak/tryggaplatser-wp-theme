@@ -1582,6 +1582,10 @@ input#custom-search-input {
   width: 100%;
 }
 
+p:empty {
+  display: none;
+}
+
 /* =========================
    Desktop: två kolumner
    lista vänster 400px, karta resten
