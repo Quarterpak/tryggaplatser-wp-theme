@@ -1612,10 +1612,10 @@ p:empty {
   #list-view {
     order: 0;
     flex: 0 0 var(--sidebar-w) !important;
-    height: 100%;
     border-right: 1px solid #ddd;
-
     max-height: 100% !important;
+
+    height: calc(100dvh - var(--nav-h));
   }
 
   /* Karta höger */
