@@ -1586,6 +1586,10 @@ p:empty {
   display: none;
 }
 
+.service_cat {
+  margin-bottom: 20px !important;
+}
+
 /* =========================
    Desktop: två kolumner
    lista vänster 400px, karta resten
@@ -1596,6 +1600,10 @@ p:empty {
     flex-direction: row;
 
     position: static;
+  }
+
+  body.home-view #page-layout {
+    height: calc(100dvh - var(--nav-h));
   }
 
   /* Navbar bara över listkolumnen */

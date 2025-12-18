@@ -41,6 +41,7 @@ const UIStateManager = {
     jQuery('#page-wrapper').removeClass('single-item-view');
     jQuery('body').removeClass('single-item-view');
     jQuery('body').removeClass('cat-view');
+    jQuery('body').removeClass('home-view');
 
     // Get the map element
     const mapElement = jQuery('#main-map');
@@ -50,6 +51,7 @@ const UIStateManager = {
       case this.PAGES.HOME:
         jQuery('#homepage').show();
         jQuery('#overview').show();
+        jQuery('body').addClass('home-view');
         // targetContainer = jQuery('#homepage .map-col');
         targetContainer = jQuery('#map-view .map-inner');
         break;
