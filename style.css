@@ -1687,3 +1687,38 @@ input#custom-search-input {
     margin-bottom: 4px;
   }
 }
+
+/* =======================================================
+   SMOOTH MAP TRANSITIONS
+   ======================================================= */
+
+/* VIKTIGT: Map container ska INTE ha transitions */
+#main-map {
+  transition: none !important;
+}
+
+/* VIKTIGT: Performance optimering för map container */
+#map-view {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Förbättra scrolling performance */
+#list-view {
+  transform: translateZ(0);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Smooth category selection highlight */
+.selected-highlight .category_card {
+  animation: highlightPulse 1.5s ease-out;
+}
+
+@keyframes highlightPulse {
+  0% {
+    background-color: #f2dec8;
+  }
+  100% {
+    background-color: #fff;
+  }
+}

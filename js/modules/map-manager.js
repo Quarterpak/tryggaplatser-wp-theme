@@ -149,13 +149,15 @@ const MapManager = {
    * Add markers to map
    * @param {Array} locations - Location data
    * @param {function} onMarkerClick - Click handler callback
+   * @returns {Array} Array of created markers
    */
   addMarkers(locations, onMarkerClick) {
-    if (!this.map) return;
+    if (!this.map) return [];
 
-    // Clear existing location markers
+    // Clear existing location markers FIRST
     this.clearMarkers();
 
+    // Add new markers
     locations.forEach((loc) => {
       const lat = parseFloat(loc.lat);
       const lng = parseFloat(loc.lng || loc.long);
@@ -174,6 +176,8 @@ const MapManager = {
         this.markers.push(marker);
       }
     });
+
+    return this.markers;
   },
 
   /**
@@ -230,45 +234,31 @@ const MapManager = {
 
   /**
    * Set map view to center and zoom level
+   * ALWAYS use flyTo for smooth animations
    * @param {number} lat
    * @param {number} lng
    * @param {number} zoom
-   * @param {boolean} animate
    */
-  setView(lat, lng, zoom = 13, animate = false) {
+  setView(lat, lng, zoom = 13) {
     if (!this.map) return;
 
-    if (animate) {
-      this.map.flyTo([lat, lng], zoom, {
-        duration: 1.5,
-        easeLinearity: 0.25,
-      });
-    } else {
-      this.map.setView([lat, lng], zoom);
-    }
+    // Always use flyTo for consistency
+    this.map.flyTo([lat, lng], zoom, {
+      duration: 1.5,
+      easeLinearity: 0.25,
+    });
   },
 
   /**
    * Smoothly fly to a location with animation
-   * Skips animation if marker is already centered
+   * @param {number} lat
+   * @param {number} lng
+   * @param {number} zoom - Zoom level (default 16 for closer view)
    */
   flyTo(lat, lng, zoom = 16) {
     if (!this.map) return;
 
-    const currentCenter = this.map.getCenter();
-    const currentZoom = this.map.getZoom();
-
-    // Check if already centered (within ~50m)
-    const latDiff = Math.abs(currentCenter.lat - lat);
-    const lngDiff = Math.abs(currentCenter.lng - lng);
-    const isAlreadyCentered =
-      latDiff < 0.0005 && lngDiff < 0.0005 && Math.abs(currentZoom - zoom) < 1;
-
-    if (isAlreadyCentered) {
-      return;
-    }
-
-    // Animate to new position
+    // Always animate - let Leaflet optimize if already centered
     this.map.flyTo([lat, lng], zoom, {
       duration: 1.5,
       easeLinearity: 0.25,
@@ -277,10 +267,12 @@ const MapManager = {
 
   /**
    * Refresh map size (useful after DOM changes)
+   * Use sparingly - can cause visual jumps
    */
   invalidateSize() {
     if (this.map) {
-      setTimeout(() => this.map.invalidateSize(), 200);
+      // Delay slightly to ensure DOM is ready
+      setTimeout(() => this.map.invalidateSize(), 100);
     }
   },
 

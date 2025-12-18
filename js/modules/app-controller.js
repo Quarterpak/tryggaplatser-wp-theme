@@ -196,35 +196,41 @@ const AppController = {
    * Display markers on homepage map
    */
   displayMarkersOnHomepage(locations) {
-    if (this.userLat && this.userLng) {
-      // With geolocation: add user marker and center on user
-      MapManager.addUserMarker(this.userLat, this.userLng);
-      MapManager.setView(this.userLat, this.userLng, 13);
-
-      this.originalHomepageView = {
-        lat: this.userLat,
-        lng: this.userLng,
-        zoom: 13,
-      };
-    } else {
-      // Without geolocation: center on Stockholm Central
-      MapManager.setView(
-        this.STOCKHOLM_CENTRAL_LAT,
-        this.STOCKHOLM_CENTRAL_LNG,
-        12
-      );
-
-      this.originalHomepageView = {
-        lat: this.STOCKHOLM_CENTRAL_LAT,
-        lng: this.STOCKHOLM_CENTRAL_LNG,
-        zoom: 12,
-      };
-    }
-
     // Add markers to the existing map
     MapManager.addMarkers(locations, (location) =>
       this.onMarkerClick(location)
     );
+
+    // Determine initial center position
+    let centerLat, centerLng, zoom;
+
+    if (this.userLat && this.userLng) {
+      // With geolocation: center on user
+      MapManager.addUserMarker(this.userLat, this.userLng);
+      centerLat = this.userLat;
+      centerLng = this.userLng;
+      zoom = 14;
+
+      this.originalHomepageView = {
+        lat: this.userLat,
+        lng: this.userLng,
+        zoom: 14,
+      };
+    } else {
+      // Without geolocation: center on Stockholm Central
+      centerLat = this.STOCKHOLM_CENTRAL_LAT;
+      centerLng = this.STOCKHOLM_CENTRAL_LNG;
+      zoom = 13;
+
+      this.originalHomepageView = {
+        lat: this.STOCKHOLM_CENTRAL_LAT,
+        lng: this.STOCKHOLM_CENTRAL_LNG,
+        zoom: 13,
+      };
+    }
+
+    // Smooth fly to initial position
+    MapManager.flyTo(centerLat, centerLng, zoom);
   },
 
   /**
@@ -306,43 +312,46 @@ const AppController = {
       this.movePostToTop(post.id);
     });
 
-    MapManager.invalidateSize();
-
     // Add user marker if available
     if (this.userLat && this.userLng) {
       MapManager.addUserMarker(this.userLat, this.userLng);
     }
 
-    // Center map on closest location
-    setTimeout(() => {
-      if (this.userLat && this.userLng) {
-        const closest = this.findClosestLocation(
-          posts,
-          this.userLat,
-          this.userLng
-        );
-        if (closest) {
-          const closestLat = parseFloat(closest.lat);
-          const closestLng = parseFloat(closest.lng || closest.long);
-          MapManager.flyTo(closestLat, closestLng, 13);
-        }
-      } else {
-        const closest = this.findClosestLocation(
-          posts,
-          this.STOCKHOLM_CENTRAL_LAT,
-          this.STOCKHOLM_CENTRAL_LNG
-        );
-        if (closest) {
-          const closestLat = parseFloat(closest.lat);
-          const closestLng = parseFloat(closest.lng || closest.long);
-          MapManager.flyTo(closestLat, closestLng, 13);
-        } else if (posts.length > 0) {
-          const firstLat = parseFloat(posts[0].lat);
-          const firstLng = parseFloat(posts[0].lng || posts[0].long);
-          MapManager.flyTo(firstLat, firstLng, 13);
-        }
+    // Determine centering behavior
+    let closestLat, closestLng;
+
+    if (this.userLat && this.userLng) {
+      // With geolocation: find closest to user
+      const closest = this.findClosestLocation(
+        posts,
+        this.userLat,
+        this.userLng
+      );
+      if (closest) {
+        closestLat = parseFloat(closest.lat);
+        closestLng = parseFloat(closest.lng || closest.long);
       }
-    }, 300);
+    } else {
+      // Without geolocation: find closest to Stockholm Central
+      const closest = this.findClosestLocation(
+        posts,
+        this.STOCKHOLM_CENTRAL_LAT,
+        this.STOCKHOLM_CENTRAL_LNG
+      );
+      if (closest) {
+        closestLat = parseFloat(closest.lat);
+        closestLng = parseFloat(closest.lng || closest.long);
+      } else if (posts.length > 0) {
+        // Fallback to first location
+        closestLat = parseFloat(posts[0].lat);
+        closestLng = parseFloat(posts[0].lng || posts[0].long);
+      }
+    }
+
+    // Smooth fly to target location
+    if (closestLat && closestLng) {
+      MapManager.flyTo(closestLat, closestLng, 14);
+    }
   },
 
   /**
@@ -398,11 +407,6 @@ const AppController = {
 
     if (lat && lng) {
       MapManager.flyTo(lat, lng, 16);
-
-      const mapElement = document.getElementById('main-map');
-      if (mapElement) {
-        mapElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
     }
   },
 
@@ -497,15 +501,13 @@ const AppController = {
 
     // Update map with single marker (don't recreate map)
     MapManager.addMarkers([post]);
-    MapManager.invalidateSize();
 
     const lat = parseFloat(post.lat);
     const lng = parseFloat(post.long);
 
+    // Smooth fly to single location
     if (lat && lng) {
-      setTimeout(() => {
-        MapManager.flyTo(lat, lng, 16);
-      }, 300);
+      MapManager.flyTo(lat, lng, 16);
     }
   },
 
