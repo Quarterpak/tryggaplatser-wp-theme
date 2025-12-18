@@ -747,7 +747,7 @@ a.bo-btn.bo-btn-direction {
 .bo-contact .bo-btn {
   background: #3b50a6;
   padding: 8px 10px;
-  border-radius: 12px;
+  border-radius: 100px;
   font-family: Plus Jakarta Sans;
   font-weight: 500;
   font-size: 16px;
@@ -991,7 +991,6 @@ p.category_open {
   font-weight: 500 !important;
 }
 div#single-posts {
-  /* height: calc(100vh - 209px); */
   overflow: auto;
 }
 .tag {
@@ -1127,9 +1126,11 @@ figure.close-location img {
     margin: 10px 0 0 0;
     max-width: 100%;
   }
-  div#category-posts,
+  div#category-posts {
+    padding: 16px 16px !important;
+  }
   div#single-posts {
-    padding: 0 20px !important;
+    padding: 24px 16px !important;
   }
   .trp-language-switcher {
     right: 15px;
@@ -1277,9 +1278,12 @@ figure.close-location img {
     padding: 0px !important;
     max-width: 100%;
   }
-  div#category-posts,
+  div#category-posts {
+    padding: 16px 16px !important;
+    max-width: 100%;
+  }
   div#single-posts {
-    padding: 0 15px !important;
+    padding: 24px 16px !important;
     max-width: 100%;
   }
   .sidebar-menu,
