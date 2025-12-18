@@ -1530,17 +1530,17 @@ p:empty {
   display: none;
 }
 
-#overview {
+/* #overview {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
+} */
 
 .service_cat {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  margin-bottom: 0px;
+  margin-bottom: 20px !important;
 }
 .service_cat_list {
   display: flex;
