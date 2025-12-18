@@ -174,41 +174,37 @@ function build_service_category_html($post_id) {
  */
 function get_post_category($post_id, $cat_id = 0) {
     $terms = wp_get_post_terms($post_id, 'services_category');
-    
-    if (empty($terms)) {
+
+    if (empty($terms) || is_wp_error($terms)) {
         return null;
     }
 
-    $cat = null;
-
-    // If specific category ID provided, find it
+    // 1) If specific category ID provided, return it if found
     if ($cat_id > 0) {
         foreach ($terms as $term) {
-            if ($term->term_id == $cat_id) {
-                $cat = $term;
-                break;
+            if ((int)$term->term_id === (int)$cat_id) {
+                return $term;
             }
         }
     }
 
-    // If no cat found, try to find parent (top-level) category
-    if (!$cat) {
-        foreach ($terms as $term) {
-            if ($term->parent == 0) {
-                $cat = $term;
-                break;
-            }
+    // 2) Prefer a TOP-LEVEL category that is NOT hygien
+    foreach ($terms as $term) {
+        if ((int)$term->parent === 0 && $term->slug !== 'hygien') {
+            return $term;
         }
     }
 
-    // Fallback to first term
-    if (!$cat) {
-        $cat = $terms[0];
+    // 3) If no top-level non-hygien found, prefer ANY non-hygien term
+    foreach ($terms as $term) {
+        if ($term->slug !== 'hygien') {
+            return $term;
+        }
     }
 
-    return $cat;
+    // 4) Fallback: only hygien exists (or hygien is the only match)
+    return $terms[0];
 }
-
 
 /**
  * Ensure service link has protocol
