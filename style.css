@@ -1642,10 +1642,9 @@ p:empty {
     inset: 0;
     right: calc(100% - var(--sidebar-w));
     z-index: 999;
-  }
 
-  #category-posts {
-    height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
   }
 
   #single-view {
