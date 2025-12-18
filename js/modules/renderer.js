@@ -300,6 +300,11 @@ const Renderer = {
 
             <div class="bo-contact">
                 ${
+                  post.cat_slug === 'matmissionen'
+                    ? `<div class="bo-test">matmissionen</div>`
+                    : ''
+                }
+                ${
                   post.service_link
                     ? `
                     <a class="bo-btn" href="${post.service_link}" target="_blank">
