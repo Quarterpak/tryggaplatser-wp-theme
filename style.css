@@ -1589,6 +1589,10 @@ p:empty {
   display: none;
 }
 
+div:empty {
+  display: none;
+}
+
 .service_cat {
   margin-bottom: 20px !important;
 }
