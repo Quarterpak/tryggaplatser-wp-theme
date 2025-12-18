@@ -1,12 +1,12 @@
 /**
- * Main Application Controller
+ * Main Application Controller - Single Map Version
  *
- * Coordinates all modules and manages the application flow.
- * Uses the modular helpers and managers created for separation of concerns.
+ * Uses ONE persistent map instance throughout the application.
+ * Only updates markers and view, never recreates the map.
  */
 
 const AppController = {
-  // Stockholm Central coordinates (fallback when no geolocation)
+  // Stockholm Central coordinates (fallback)
   STOCKHOLM_CENTRAL_LAT: 59.33024608264878,
   STOCKHOLM_CENTRAL_LNG: 18.058248426091545,
 
@@ -14,7 +14,7 @@ const AppController = {
   userLat: null,
   userLng: null,
 
-  // Store original map view for homepage reset
+  // Store original homepage view
   originalHomepageView: null,
 
   /**
@@ -23,7 +23,16 @@ const AppController = {
   init() {
     this.setupGeolocation();
     this.setupEventListeners();
+    this.initializeMap();
     this.initializeHomepage();
+  },
+
+  /**
+   * Initialize the map ONCE on app startup
+   */
+  initializeMap() {
+    console.log('Initializing single map instance...');
+    MapManager.initMap();
   },
 
   /**
@@ -35,6 +44,11 @@ const AppController = {
         (position) => {
           this.userLat = position.coords.latitude;
           this.userLng = position.coords.longitude;
+
+          // Add user marker to map if already initialized
+          if (MapManager.getMap()) {
+            MapManager.addUserMarker(this.userLat, this.userLng);
+          }
         },
         (error) => {
           console.warn('Geolocation error:', error.message);
@@ -45,12 +59,6 @@ const AppController = {
 
   /**
    * Calculate distance between two points using Haversine formula
-   *
-   * @param {number} lat1 - First latitude
-   * @param {number} lng1 - First longitude
-   * @param {number} lat2 - Second latitude
-   * @param {number} lng2 - Second longitude
-   * @returns {number} Distance in kilometers
    */
   calculateDistance(lat1, lng1, lat2, lng2) {
     const R = 6371; // Radius of Earth in km
@@ -68,11 +76,6 @@ const AppController = {
 
   /**
    * Find the location closest to a given point
-   *
-   * @param {Array} locations - Array of location objects with lat/lng or lat/long properties
-   * @param {number} refLat - Reference latitude
-   * @param {number} refLng - Reference longitude
-   * @returns {Object|null} Closest location or null if no locations
    */
   findClosestLocation(locations, refLat, refLng) {
     if (!locations || locations.length === 0) return null;
@@ -105,56 +108,46 @@ const AppController = {
    * Setup all event listeners
    */
   setupEventListeners() {
-    // Category navigation
     jQuery(document).on('click', '.service_cat_list_details', (e) =>
       this.onCategoryClick(e)
     );
 
-    // Category link in posts
     jQuery(document).on('click', '.category_card_link, .read-more-link', (e) =>
       this.onPostClick(e)
     );
 
-    // Category card click to center map (when not navigating to single post)
     jQuery(document).on('click', '.category_card', (e) =>
       this.onCategoryCardClick(e)
     );
 
-    // Back button
     jQuery(document).on('click', '.back-btn', () => this.onBackClick());
 
-    // Direction buttons
     jQuery(document).on('click', '.btn_icon, .bo-btn-direction', (e) =>
       this.onDirectionsClick(e)
     );
 
-    // Location info close
     jQuery(document).on(
       'click',
       '.location-info-wrap .close-location, .location-info-wrap .close-icon',
       () => this.onCloseLocationInfo()
     );
 
-    // Menu toggle
     jQuery(document).on('click', '.header-controls .open-menu-cat', () =>
       UIStateManager.toggleMenu('open')
     );
 
-    // Dropdown toggle
     jQuery(document).on(
       'click',
       '.dropdown-toggle, .dropdown-toggle-single',
       (e) => this.onDropdownToggle(e)
     );
 
-    // Subcategory filter
     jQuery(document)
       .off('change', "#subcategory-container input[type='checkbox']")
       .on('change', "#subcategory-container input[type='checkbox']", () =>
         this.onSubcategoryFilter()
       );
 
-    // Group selection filter
     jQuery(document)
       .off('change', '.dropdown-item-single input[type="checkbox"]')
       .on('change', '.dropdown-item-single input[type="checkbox"]', () =>
@@ -183,10 +176,7 @@ const AppController = {
   loadHomepage() {
     UIStateManager.showPage(UIStateManager.PAGES.HOME);
 
-    // Initialize main map
-    const map = MapManager.initMap('main-map');
-
-    // Fetch and display markers
+    // Fetch and display markers on the existing map
     DataFetcher.getAllLocations()
       .done((response) => {
         if (response.success) {
@@ -194,24 +184,23 @@ const AppController = {
         }
       })
       .fail(() => {
-        map.setView([59.33024608264878, 18.058248426091545], 12);
+        MapManager.setView(
+          this.STOCKHOLM_CENTRAL_LAT,
+          this.STOCKHOLM_CENTRAL_LNG,
+          12
+        );
       });
   },
 
   /**
    * Display markers on homepage map
-   *
-   * @param {Array} locations - Location data
    */
   displayMarkersOnHomepage(locations) {
-    const mapId = 'main-map';
-    const map = MapManager.getMap(mapId);
-
     if (this.userLat && this.userLng) {
-      // With geolocation: center on user's position
-      MapManager.addUserMarker(mapId, this.userLat, this.userLng);
-      map.setView([this.userLat, this.userLng], 13);
-      // Store original view for reset
+      // With geolocation: add user marker and center on user
+      MapManager.addUserMarker(this.userLat, this.userLng);
+      MapManager.setView(this.userLat, this.userLng, 13);
+
       this.originalHomepageView = {
         lat: this.userLat,
         lng: this.userLng,
@@ -219,8 +208,12 @@ const AppController = {
       };
     } else {
       // Without geolocation: center on Stockholm Central
-      map.setView([this.STOCKHOLM_CENTRAL_LAT, this.STOCKHOLM_CENTRAL_LNG], 12);
-      // Store original view for reset
+      MapManager.setView(
+        this.STOCKHOLM_CENTRAL_LAT,
+        this.STOCKHOLM_CENTRAL_LNG,
+        12
+      );
+
       this.originalHomepageView = {
         lat: this.STOCKHOLM_CENTRAL_LAT,
         lng: this.STOCKHOLM_CENTRAL_LNG,
@@ -228,86 +221,52 @@ const AppController = {
       };
     }
 
-    MapManager.addMarkersToMap(mapId, locations, (location) =>
+    // Add markers to the existing map
+    MapManager.addMarkers(locations, (location) =>
       this.onMarkerClick(location)
     );
   },
 
   /**
    * Handle marker click on homepage
-   *
-   * @param {Object} location - Location data
    */
   onMarkerClick(location) {
-    // Center map on clicked marker with zoom and animation
     const lat = parseFloat(location.lat);
     const lng = parseFloat(location.lng || location.long);
+
     if (lat && lng) {
-      MapManager.flyTo('main-map', lat, lng, 16);
+      MapManager.flyTo(lat, lng, 16);
     }
 
     UIStateManager.showLocationInfo();
     Renderer.renderLocationInfoPopup(location);
-
-    // if (this.userLat && this.userLng) {
-
-    //                jQuery(".location-distance").html(
-    //         `<img src='/wp-content/uploads/2025/10/directions_walk.svg' alt='walking-icon'/>
-    //          <span>Calculating...</span>`
-    //     );
-
-    //     calculateDistanceAndTime(
-    //         this.userLat,
-    //         this.userLng,
-    //         location.lat,
-    //         location.lng,
-    //         (result) => {
-    //             jQuery(".location-distance").html(
-    //                 `<img src='/wp-content/uploads/2025/10/directions_walk.svg' alt='walking-icon'/>
-    //                  <span>${result}</span>`
-    //             );
-    //         }
-    //     );
-    // } else {
-    //     jQuery(".location-distance").html("<p>User location unavailable</p>");
-    // }
   },
 
   /**
    * Handle category click
-   *
-   * @param {Event} e
    */
   onCategoryClick(e) {
     e.preventDefault();
 
     const $link = jQuery(e.currentTarget);
     const catId = $link.data('cat-id');
-
     const catSlug = $link.data('cat-slug');
     const catName = $link.data('cat-name');
     const catImage = $link.data('cat-image');
 
-    // Show category view and category header instantly (don't wait for AJAX)
     UIStateManager.showPage(UIStateManager.PAGES.CATEGORY);
 
-    // Render category header immediately with data from link attributes
     Renderer.renderCategoryHeaderInstant({
       cat_slug: catSlug,
       cat_name: catName,
       cat_image: catImage,
     });
 
-    // Load category posts in background
-
     this.loadCategory(catId, true);
   },
 
   /**
    * Load category and its posts
-   *
-   * @param {number} catId - Category ID
-   * @param {boolean} pushHistory - Whether to push browser history
    */
   loadCategory(catId, pushHistory = true) {
     UIStateManager.showPage(UIStateManager.PAGES.CATEGORY);
@@ -317,15 +276,7 @@ const AppController = {
       UIStateManager.pushHistory(UIStateManager.PAGES.CATEGORY, { catId });
     }
 
-    // Show loader
     Renderer.showCategoryLoader();
-
-    // Initialize main map
-    const mapId = 'main-map';
-    MapManager.initMap(mapId);
-
-    // Clear old markers before loading new ones
-    MapManager.clearMarkers(mapId);
 
     DataFetcher.getCategoryPosts(catId)
       .done((response) => {
@@ -341,41 +292,30 @@ const AppController = {
 
   /**
    * Display posts in category view
-   *
-   * @param {Array} posts - Post array
-   * @param {number} catId - Category ID
    */
   displayCategoryPosts(posts, catId) {
-    console.log('app-controller - displayCategoryPosts: ', posts);
-    // Hide loader
     Renderer.hideCategoryLoader();
-
-    // Render posts
     Renderer.renderCategoryPosts(posts, catId);
 
-    // Render header
     if (posts.length > 0) {
       Renderer.renderCategoryHeader(posts[0]);
     }
 
-    // Clear old markers and add new ones to map
-    const mapId = 'main-map';
-    MapManager.clearMarkers(mapId);
-    MapManager.addMarkersToMap(mapId, posts, (post) => {
+    // Update markers on the existing map (don't recreate it)
+    MapManager.addMarkers(posts, (post) => {
       this.movePostToTop(post.id);
     });
 
-    MapManager.invalidateSize(mapId);
+    MapManager.invalidateSize();
 
-    // Add user location marker if available
+    // Add user marker if available
     if (this.userLat && this.userLng) {
-      MapManager.addUserMarker(mapId, this.userLat, this.userLng);
+      MapManager.addUserMarker(this.userLat, this.userLng);
     }
 
-    // Determine centering behavior
+    // Center map on closest location
     setTimeout(() => {
       if (this.userLat && this.userLng) {
-        // With geolocation: center on location closest to user
         const closest = this.findClosestLocation(
           posts,
           this.userLat,
@@ -384,10 +324,9 @@ const AppController = {
         if (closest) {
           const closestLat = parseFloat(closest.lat);
           const closestLng = parseFloat(closest.lng || closest.long);
-          MapManager.flyTo(mapId, closestLat, closestLng, 13);
+          MapManager.flyTo(closestLat, closestLng, 13);
         }
       } else {
-        // Without geolocation: center on location closest to Stockholm Central
         const closest = this.findClosestLocation(
           posts,
           this.STOCKHOLM_CENTRAL_LAT,
@@ -396,35 +335,18 @@ const AppController = {
         if (closest) {
           const closestLat = parseFloat(closest.lat);
           const closestLng = parseFloat(closest.lng || closest.long);
-          MapManager.flyTo(mapId, closestLat, closestLng, 13);
+          MapManager.flyTo(closestLat, closestLng, 13);
         } else if (posts.length > 0) {
-          // Fallback to first location if no closest found
           const firstLat = parseFloat(posts[0].lat);
           const firstLng = parseFloat(posts[0].lng || posts[0].long);
-          MapManager.flyTo(mapId, firstLat, firstLng, 13);
+          MapManager.flyTo(firstLat, firstLng, 13);
         }
       }
     }, 300);
-
-    // Calculate distances if user location available
-    // if (this.userLat && this.userLng) {
-    //     posts.forEach(post => {
-    //         // console.log(post);
-    //         this.calculateAndDisplayDistance(
-    //             this.userLat,
-    //             this.userLng,
-    //             post.lat,
-    //             post.long,
-    //             post.id
-    //         );
-    //     });
-    // }
   },
 
   /**
    * Load subcategories for current category
-   *
-   * @param {number} catId - Category ID
    */
   loadCategorySubcategories(catId) {
     DataFetcher.getSubcategoriesByParent(catId).done((response) => {
@@ -435,30 +357,7 @@ const AppController = {
   },
 
   /**
-   * Calculate and display distance for a post
-   *
-   * @param {number} userLat, userLng - User coordinates
-   * @param {number} destLat, destLng - Destination coordinates
-   * @param {string} pageType - 'category' or 'single' to determine update method
-   */
-  // calculateAndDisplayDistance(userLat, userLng, destLat, destLng, postId, pageType = 'category') {
-  //     if (!userLat || !userLng || !destLat || !destLng) {
-  //         console.warn("Missing coordinates for distance calculation", {userLat, userLng, destLat, destLng});
-  //         return;
-  //     }
-  //     calculateDistanceAndTime(userLat, userLng, destLat, destLng, (result) => {
-  //         if (pageType === 'single') {
-  //             Renderer.updateSingleDistance(result);
-  //         } else {
-  //             Renderer.updateDistance(postId, result);
-  //         }
-  //     });
-  // },
-
-  /**
-   * Move post to top of list (used for map marker click)
-   *
-   * @param {number} postId - Post ID
+   * Move post to top of list
    */
   movePostToTop(postId) {
     const listWrapper = document.getElementById('category-posts');
@@ -469,11 +368,11 @@ const AppController = {
     );
     if (!selectedItem) return;
 
-    // Center map on this post with smooth animation
     const lat = parseFloat(selectedItem.dataset.lat);
     const lng = parseFloat(selectedItem.dataset.lng);
+
     if (lat && lng) {
-      MapManager.flyTo('main-map', lat, lng, 16);
+      MapManager.flyTo(lat, lng, 16);
     }
 
     listWrapper.prepend(selectedItem);
@@ -485,11 +384,8 @@ const AppController = {
 
   /**
    * Handle category card click to center map
-   *
-   * @param {Event} e
    */
   onCategoryCardClick(e) {
-    // Don't interfere with link navigation
     if (jQuery(e.target).closest('.category_card_link').length) {
       return;
     }
@@ -501,10 +397,9 @@ const AppController = {
     const lng = parseFloat($link.data('lng'));
 
     if (lat && lng) {
-      MapManager.flyTo('category-map', lat, lng, 16);
+      MapManager.flyTo(lat, lng, 16);
 
-      // Scroll to top to show map better
-      const mapElement = document.getElementById('category-map');
+      const mapElement = document.getElementById('main-map');
       if (mapElement) {
         mapElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -513,21 +408,17 @@ const AppController = {
 
   /**
    * Handle post click
-   *
-   * @param {Event} e
    */
   onPostClick(e) {
     e.preventDefault();
     const $link = jQuery(e.currentTarget);
     const postId = $link.data('post-id');
     const catId = $link.data('cat-id') || 0;
-
     const catSlug = $link.data('cat-slug');
     const catName = $link.data('cat-name');
     const catImage = $link.data('cat-image');
     const postImage = $link.data('post-image');
 
-    // Show single page immediately and render header from link attributes
     UIStateManager.showPage(UIStateManager.PAGES.SINGLE);
     Renderer.renderSingleHeaderInstant({
       cat_slug: catSlug,
@@ -536,17 +427,11 @@ const AppController = {
       post_image: postImage,
     });
 
-    // Load single post details in background
-
     this.loadSinglePost(postId, true, catId);
   },
 
   /**
    * Load single post page
-   *
-   * @param {number} postId - Post ID
-   * @param {boolean} pushHistory - Whether to push browser history
-   * @param {number} catId - Category ID (optional)
    */
   loadSinglePost(postId, pushHistory = true, catId = 0) {
     UIStateManager.showPage(UIStateManager.PAGES.SINGLE);
@@ -556,15 +441,7 @@ const AppController = {
       UIStateManager.pushHistory(UIStateManager.PAGES.SINGLE, { postId });
     }
 
-    // Show loader
     Renderer.showSinglePostLoader();
-
-    // Initialize main map
-    const mapId = 'main-map';
-    MapManager.initMap(mapId);
-
-    // Clear old markers before loading new ones
-    MapManager.clearMarkers(mapId);
 
     DataFetcher.getSinglePost(postId, catId)
       .done((response) => {
@@ -579,79 +456,57 @@ const AppController = {
 
   /**
    * Display single post details
-   *
-   * @param {Object} post - Post data
    */
   displaySinglePost(post) {
-    // Hide loader
     Renderer.hideSinglePostLoader();
 
-    // Render post header only if it wasn't already rendered instantly
     const $singleHeader = jQuery('#single-post-header');
     if (!$singleHeader.data('instant-rendered')) {
       const catHTML = `
-                <div class="header-archive">
-                    <div class="header-archive-inr">
-                        <div class="header-controls">
-                            ${renderIconButton({
-                              className: 'back-btn cat',
-                              ariaLabel: 'Tillbaka till kategori',
-                              imgSrc:
-                                '/wp-content/uploads/2025/10/back-white.svg',
-                              imgAlt: 'Tillbaka',
-                              dataAttrs: { 'cat-slug': post.cat_slug },
-                            })}
-                        </div>
-                        <div class="header-archive-name">
-                            ${
-                              post.cat_image
-                                ? `<img src="${post.cat_image}" class="category-header-img" />`
-                                : ''
-                            }
-                            <h3 class="s-cat-name">${post.cat_name}</h3>
-                        </div>
-                    </div>
-                </div>
-            `;
+        <div class="header-archive">
+          <div class="header-archive-inr">
+            <div class="header-controls">
+              ${renderIconButton({
+                className: 'back-btn cat',
+                ariaLabel: 'Tillbaka till kategori',
+                imgSrc: '/wp-content/uploads/2025/10/back-white.svg',
+                imgAlt: 'Tillbaka',
+                dataAttrs: { 'cat-slug': post.cat_slug },
+              })}
+            </div>
+            <div class="header-archive-name">
+              ${
+                post.cat_image
+                  ? `<img src="${post.cat_image}" class="category-header-img" />`
+                  : ''
+              }
+              <h3 class="s-cat-name">${post.cat_name}</h3>
+            </div>
+          </div>
+        </div>
+      `;
       $singleHeader.removeClass().addClass(post.cat_slug).html(catHTML);
     } else {
-      // Clear the instant-rendered marker so future navigations can update header
       $singleHeader.removeData('instant-rendered');
     }
 
-    // Render groups schedule popup if exists
     const popupHTML = Renderer.renderGroupsSchedulePopup(post.groups_schedule);
     jQuery('#single-post-header').after(popupHTML);
 
-    // Render post content
     Renderer.renderSinglePost(post);
 
-    // Clear old markers and add new map marker
-    const mapId = 'main-map';
-    MapManager.clearMarkers(mapId);
-    MapManager.addMarkersToMap(mapId, [post]);
-    MapManager.invalidateSize(mapId);
+    // Update map with single marker (don't recreate map)
+    MapManager.addMarkers([post]);
+    MapManager.invalidateSize();
 
-    // Center map on service location with smooth animation
     const lat = parseFloat(post.lat);
     const lng = parseFloat(post.long);
+
     if (lat && lng) {
       setTimeout(() => {
-        MapManager.flyTo(mapId, lat, lng, 16);
+        MapManager.flyTo(lat, lng, 16);
       }, 300);
     }
-
-    // Calculate distance if needed
-    // if (this.userLat && this.userLng) {
-    //     this.calculateAndDisplayDistance(
-    //         this.userLat,
-    //         this.userLng,
-    //         post.lat,
-    //         post.long,
-    //         post.id,
-    //         'single'
-    //     );
-    // }
   },
 
   /**
@@ -669,8 +524,6 @@ const AppController = {
 
   /**
    * Handle directions click
-   *
-   * @param {Event} e
    */
   onDirectionsClick(e) {
     const destLat = parseFloat(jQuery(e.currentTarget).data('lat'));
@@ -691,13 +544,11 @@ const AppController = {
   onCloseLocationInfo() {
     UIStateManager.hideLocationInfo();
 
-    // Reset map to original view if on homepage
     if (
       UIStateManager.currentPage === UIStateManager.PAGES.HOME &&
       this.originalHomepageView
     ) {
       MapManager.flyTo(
-        'main-map',
         this.originalHomepageView.lat,
         this.originalHomepageView.lng,
         this.originalHomepageView.zoom
@@ -707,8 +558,6 @@ const AppController = {
 
   /**
    * Handle dropdown toggle
-   *
-   * @param {Event} e
    */
   onDropdownToggle(e) {
     e.preventDefault();
@@ -733,7 +582,6 @@ const AppController = {
     });
 
     if (selectedIds.length === 0) {
-      // Reload all posts for current category
       const catId = localStorage.getItem('currentCatId');
       if (catId) {
         this.loadCategory(parseInt(catId), false);
@@ -741,20 +589,17 @@ const AppController = {
       return;
     }
 
-    // Show loader
     Renderer.showCategoryLoader();
 
-    // Load posts for selected subcategories
     DataFetcher.getSubcategoryPostsMultiple(selectedIds)
       .done((response) => {
         Renderer.hideCategoryLoader();
         if (response.success) {
-          const mapId = 'main-map';
           Renderer.renderCategoryPosts(
             response.data,
             localStorage.getItem('currentCatId')
           );
-          MapManager.addMarkersToMap(mapId, response.data);
+          MapManager.addMarkers(response.data);
         }
       })
       .fail(() => {

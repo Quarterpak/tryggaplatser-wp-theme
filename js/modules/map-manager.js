@@ -1,61 +1,52 @@
 /**
- * Map Management Module
+ * Map Management Module - Single Map Instance
  *
- * Handles all map initialization, configuration, controls, and marker management.
- * Reduces duplication and centralizes map-related logic.
+ * Handles ONE map instance that persists throughout the application.
+ * Only updates markers and view, never recreates the map.
  */
 
 const MapManager = {
-  maps: {},
-  markers: {},
-  userMarkers: {},
+  map: null,
+  markers: [],
+  userMarker: null,
+  maptilerKey: 'nyDjavgEFs1USutIvTNH',
 
   /**
-   * Initialize a map with common settings
-   *
-   * @param {string} containerId - HTML element ID
-   * @param {Object} options - Optional map configuration
-   * @returns {L.Map} Leaflet map instance
+   * Initialize the map ONCE on app startup
+   * This should only be called once when the app loads
    */
-  initMap(containerId, options = {}) {
-    console.log('map-manager - initMap containerId: ', containerId);
-    if (this.maps[containerId]) {
-      return this.maps[containerId];
+  initMap() {
+    if (this.map) {
+      console.log('Map already initialized, skipping...');
+      return this.map;
     }
 
-    const defaultOptions = {
-      zoomControl: false,
-      center: [59.3293, 18.0686],
-      zoom: 13,
-      ...options,
-    };
+    console.log('Initializing map for the first time...');
 
-    const map = L.map(containerId, {
-      zoomControl: defaultOptions.zoomControl,
-    }).setView(defaultOptions.center, defaultOptions.zoom);
+    // Create map
+    this.map = L.map('main-map', {
+      zoomControl: false,
+    }).setView([59.3293, 18.0686], 13);
 
     // Add zoom control
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
     // Add locate control
-    this.addLocateControl(map);
+    this.addLocateControl();
 
     // Add tile layer
-    this.addTileLayer(map);
+    this.addTileLayer();
 
-    this.maps[containerId] = map;
-    return map;
+    return this.map;
   },
 
   /**
    * Add locate button control to map
-   *
-   * @param {L.Map} map
    */
-  addLocateControl(map) {
+  addLocateControl() {
     const locateBtn = L.control({ position: 'bottomright' });
 
-    locateBtn.onAdd = function (map) {
+    locateBtn.onAdd = (map) => {
       const div = L.DomUtil.create(
         'div',
         'leaflet-control leaflet-control-custom'
@@ -80,14 +71,14 @@ const MapManager = {
 
       L.DomEvent.disableClickPropagation(div);
 
-      div.onclick = function () {
+      div.onclick = () => {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
-            function (pos) {
+            (pos) => {
               const latlng = [pos.coords.latitude, pos.coords.longitude];
-              map.setView(latlng, 15);
+              this.flyTo(latlng[0], latlng[1], 15);
             },
-            function () {
+            () => {
               alert('Unable to retrieve your location.');
             }
           );
@@ -99,41 +90,32 @@ const MapManager = {
       return div;
     };
 
-    locateBtn.addTo(map);
+    locateBtn.addTo(this.map);
   },
 
   /**
    * Add tile layer to map
-   *
-   * @param {L.Map} map
    */
-  addTileLayer(map) {
-    const maptilerKey = 'nyDjavgEFs1USutIvTNH';
+  addTileLayer() {
     L.tileLayer(
-      `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${maptilerKey}`,
+      `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${this.maptilerKey}`,
       {
         attribution: '&copy; <a href="https://www.maptiler.com/">MapTiler</a>',
         tileSize: 512,
         zoomOffset: -1,
       }
-    ).addTo(map);
+    ).addTo(this.map);
   },
 
   /**
-   * Add user location marker
-   *
-   * @param {string} mapId - Map container ID
-   * @param {number} lat
-   * @param {number} lng
-   * @returns {L.Marker} User marker
+   * Add or update user location marker
    */
-  addUserMarker(mapId, lat, lng) {
-    const map = this.maps[mapId];
-    if (!map) return null;
+  addUserMarker(lat, lng) {
+    if (!this.map) return null;
 
     // Remove existing user marker
-    if (this.userMarkers[mapId]) {
-      map.removeLayer(this.userMarkers[mapId]);
+    if (this.userMarker) {
+      this.map.removeLayer(this.userMarker);
     }
 
     const userIcon = L.icon({
@@ -143,52 +125,36 @@ const MapManager = {
       popupAnchor: [0, -20],
     });
 
-    const marker = L.marker([lat, lng], { icon: userIcon })
+    this.userMarker = L.marker([lat, lng], { icon: userIcon })
       .bindPopup('<b>You are here!</b>')
-      .addTo(map);
+      .addTo(this.map);
 
-    this.userMarkers[mapId] = marker;
-    return marker;
+    return this.userMarker;
   },
 
   /**
-   * Clear all markers from a map
-   *
-   * @param {string} mapId - Map container ID
+   * Clear all location markers (NOT the user marker)
    */
-  clearMarkers(mapId) {
-    if (!this.markers[mapId]) {
-      this.markers[mapId] = [];
-    }
+  clearMarkers() {
+    if (!this.map) return;
 
-    this.markers[mapId].forEach((m) => {
-      const map = this.maps[mapId];
-      if (map) map.removeLayer(m);
+    this.markers.forEach((m) => {
+      this.map.removeLayer(m);
     });
 
-    this.markers[mapId] = [];
+    this.markers = [];
   },
 
   /**
-   * Add markers to map layer group
-   *
-   * @param {string} mapId - Map container ID
+   * Add markers to map
    * @param {Array} locations - Location data
    * @param {function} onMarkerClick - Click handler callback
-   * @returns {L.LayerGroup}
    */
-  addMarkersToMap(mapId, locations, onMarkerClick) {
-    const map = this.maps[mapId];
-    if (!map) return null;
+  addMarkers(locations, onMarkerClick) {
+    if (!this.map) return;
 
-    if (!this.markers[mapId]) {
-      this.markers[mapId] = [];
-    }
-
-    let markersLayer;
-    if (this.markers[mapId].length > 0) {
-      this.clearMarkers(mapId);
-    }
+    // Clear existing location markers
+    this.clearMarkers();
 
     locations.forEach((loc) => {
       const lat = parseFloat(loc.lat);
@@ -197,65 +163,32 @@ const MapManager = {
       if (lat && lng) {
         const icon = getCustomIcon(loc.cat_slug);
 
-        const marker = L.marker([lat, lng], { icon }).addTo(map);
+        const marker = L.marker([lat, lng], { icon }).addTo(this.map);
 
         if (onMarkerClick) {
-          marker.on('click', function () {
+          marker.on('click', () => {
             onMarkerClick(loc);
           });
         }
 
-        this.markers[mapId].push(marker);
+        this.markers.push(marker);
       }
     });
-
-    return this.markers[mapId];
   },
 
   /**
-   * Fit map bounds to locations
-   *
-   * @param {string} mapId - Map container ID
-   * @param {Array} bounds - Array of [lat, lng] pairs
-   * @param {boolean} animate - Whether to animate the transition
-   */
-  fitBounds(mapId, bounds, animate = false) {
-    const map = this.maps[mapId];
-    if (!map || bounds.length === 0) return;
-
-    const latLngBounds = L.latLngBounds(bounds);
-    if (latLngBounds.isValid()) {
-      if (animate) {
-        map.flyToBounds(latLngBounds, {
-          padding: [50, 50],
-          duration: 1.5,
-          easeLinearity: 0.25,
-        });
-      } else {
-        map.fitBounds(latLngBounds, { padding: [50, 50] });
-      }
-    }
-  },
-
-  /**
-   * Smoothly fly to bounds with animation
-   * Only animates to markers that have valid coordinates
-   * Skips animation if markers are very close together (within 500m)
-   *
-   * @param {string} mapId - Map container ID
+   * Fit map bounds to locations with animation
    * @param {Array} locations - Array of location objects with lat/lng
-   * @param {Object} userLocation - Optional user location {lat, lng} to include in bounds
+   * @param {Object} userLocation - Optional user location {lat, lng}
    */
-  flyToBounds(mapId, locations, userLocation = null) {
-    const map = this.maps[mapId];
-    if (!map || !locations || locations.length === 0) return;
+  flyToBounds(locations, userLocation = null) {
+    if (!this.map || !locations || locations.length === 0) return;
 
     // Filter to only valid locations with coordinates
     const validBounds = locations
       .map((loc) => {
         const lat = parseFloat(loc.lat);
         const lng = parseFloat(loc.lng || loc.long);
-        // Only include if both coordinates are valid numbers
         return lat && lng && !isNaN(lat) && !isNaN(lng) ? [lat, lng] : null;
       })
       .filter((coord) => coord !== null);
@@ -265,32 +198,28 @@ const MapManager = {
       validBounds.push([userLocation.lat, userLocation.lng]);
     }
 
-    // Only animate if we have valid markers
     if (validBounds.length === 0) return;
 
     const latLngBounds = L.latLngBounds(validBounds);
     if (!latLngBounds.isValid()) return;
 
-    // Check if markers are nearby (within ~500m - about 0.005 degrees)
+    // Check if markers are nearby (within ~500m)
     const ne = latLngBounds.getNorthEast();
     const sw = latLngBounds.getSouthWest();
     const latDiff = Math.abs(ne.lat - sw.lat);
     const lngDiff = Math.abs(ne.lng - sw.lng);
     const areNearby = latDiff < 0.005 && lngDiff < 0.005;
 
-    // If only one marker, use flyTo with specific zoom
+    // If only one marker, use flyTo
     if (validBounds.length === 1) {
-      map.flyTo(validBounds[0], 16, {
-        duration: 1.5,
-        easeLinearity: 0.25,
-      });
+      this.flyTo(validBounds[0][0], validBounds[0][1], 16);
     } else if (areNearby) {
       // Markers are nearby - just center without animation
       const center = latLngBounds.getCenter();
-      map.setView(center, 15);
+      this.map.setView(center, 15);
     } else {
-      // Multiple markers spread out - animate to fit all in view
-      map.flyToBounds(latLngBounds, {
+      // Multiple markers spread out - animate to fit all
+      this.map.flyToBounds(latLngBounds, {
         padding: [80, 80],
         duration: 1.5,
         easeLinearity: 0.25,
@@ -301,56 +230,46 @@ const MapManager = {
 
   /**
    * Set map view to center and zoom level
-   *
-   * @param {string} mapId - Map container ID
    * @param {number} lat
    * @param {number} lng
    * @param {number} zoom
-   * @param {boolean} animate - Whether to animate the transition
+   * @param {boolean} animate
    */
-  setView(mapId, lat, lng, zoom = 13, animate = false) {
-    const map = this.maps[mapId];
-    if (map) {
-      if (animate) {
-        map.flyTo([lat, lng], zoom, {
-          duration: 1.5,
-          easeLinearity: 0.25,
-        });
-      } else {
-        map.setView([lat, lng], zoom);
-      }
+  setView(lat, lng, zoom = 13, animate = false) {
+    if (!this.map) return;
+
+    if (animate) {
+      this.map.flyTo([lat, lng], zoom, {
+        duration: 1.5,
+        easeLinearity: 0.25,
+      });
+    } else {
+      this.map.setView([lat, lng], zoom);
     }
   },
 
   /**
    * Smoothly fly to a location with animation
    * Skips animation if marker is already centered
-   *
-   * @param {string} mapId - Map container ID
-   * @param {number} lat
-   * @param {number} lng
-   * @param {number} zoom - Zoom level (default 16 for closer view)
    */
-  flyTo(mapId, lat, lng, zoom = 16) {
-    const map = this.maps[mapId];
-    if (!map) return;
+  flyTo(lat, lng, zoom = 16) {
+    if (!this.map) return;
 
-    const currentCenter = map.getCenter();
-    const currentZoom = map.getZoom();
+    const currentCenter = this.map.getCenter();
+    const currentZoom = this.map.getZoom();
 
-    // Check if marker is already centered (within small threshold ~50m)
+    // Check if already centered (within ~50m)
     const latDiff = Math.abs(currentCenter.lat - lat);
     const lngDiff = Math.abs(currentCenter.lng - lng);
     const isAlreadyCentered =
       latDiff < 0.0005 && lngDiff < 0.0005 && Math.abs(currentZoom - zoom) < 1;
 
     if (isAlreadyCentered) {
-      // Already centered, no animation needed
       return;
     }
 
     // Animate to new position
-    map.flyTo([lat, lng], zoom, {
+    this.map.flyTo([lat, lng], zoom, {
       duration: 1.5,
       easeLinearity: 0.25,
     });
@@ -358,23 +277,17 @@ const MapManager = {
 
   /**
    * Refresh map size (useful after DOM changes)
-   *
-   * @param {string} mapId - Map container ID
    */
-  invalidateSize(mapId) {
-    const map = this.maps[mapId];
-    if (map) {
-      setTimeout(() => map.invalidateSize(), 200);
+  invalidateSize() {
+    if (this.map) {
+      setTimeout(() => this.map.invalidateSize(), 200);
     }
   },
 
   /**
-   * Get map instance
-   *
-   * @param {string} mapId - Map container ID
-   * @returns {L.Map|null}
+   * Get the map instance
    */
-  getMap(mapId) {
-    return this.maps[mapId] || null;
+  getMap() {
+    return this.map;
   },
 };
