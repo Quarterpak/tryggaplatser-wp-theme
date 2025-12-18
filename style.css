@@ -1482,13 +1482,16 @@ body.single-item-view div.gtranslate_wrapper {
 
 .overview-layout #list-view {
   flex: 0 0 auto;
-
-  max-height: 50vh;
+  /* max-height: 50vh; */
   overflow-y: auto;
 }
 
 .overview-layout #map-view {
   flex: 1 1 auto;
+}
+
+body.cat-view #list-view {
+  max-height: 50vh;
 }
 
 #map-view {

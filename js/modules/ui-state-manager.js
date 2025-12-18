@@ -40,6 +40,7 @@ const UIStateManager = {
     jQuery('#page-layout').removeClass('single-item-view');
     jQuery('#page-wrapper').removeClass('single-item-view');
     jQuery('body').removeClass('single-item-view');
+    jQuery('body').removeClass('cat-view');
 
     // Get the map element
     const mapElement = jQuery('#main-map');
@@ -55,6 +56,7 @@ const UIStateManager = {
       case this.PAGES.CATEGORY:
         jQuery('#category-page').show();
         jQuery('#category-view').show();
+        jQuery('body').addClass('cat-view');
         // targetContainer = jQuery('#category-page .category-col-map');
         targetContainer = jQuery('#map-view .map-inner');
         break;
