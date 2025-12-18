@@ -740,31 +740,35 @@ input#custom-search-input::placeholder {
   gap: 8px;
   width: 100%;
 }
-a.bo-btn.bo-btn-direction {
-  max-width: 190px;
-  width: 100%;
+a.bo-btn.bo-btn-matmissionen {
+  background: #c94c08;
 }
 .bo-contact .bo-btn {
-  background: #3b50a6;
-  padding: 8px 10px;
-  border-radius: 100px;
-  font-family: Plus Jakarta Sans;
-  font-weight: 500;
-  font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: 50%;
-  text-decoration: none;
-  color: #fff;
-  cursor: pointer;
+  width: auto;
+  max-width: 100%;
+  flex: 0 0 auto;
+  min-height: 50px;
+  white-space: nowrap;
   line-height: 1;
+  background: #3b50a6;
+  padding: 8px 12px;
+  border-radius: 100px;
+  font-family: 'Plus Jakarta Sans';
+  font-weight: 500;
+  font-size: 16px;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
 }
 .bo-contact {
-  padding-bottom: 30px;
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 30px;
 }
 p.closing-status {
   font-weight: 500;
