@@ -300,11 +300,6 @@ const Renderer = {
 
             <div class="bo-contact">
                 ${
-                  post.cat_slug === 'matmissionen'
-                    ? `<div class="bo-test">matmissionen</div>`
-                    : ''
-                }
-                ${
                   post.service_link
                     ? `
                     <a class="bo-btn" href="${post.service_link}" target="_blank">
@@ -320,6 +315,15 @@ const Renderer = {
                     <img src="/wp-content/uploads/2025/10/directions-1.svg" alt="Directions">
                     <span>Vägbeskrivning</span>
                 </a>
+                ${
+                  post.cat_slug === 'matmissionen'
+                    ? `
+                      <a class="bo-btn bo-btn-matmissionen" href="https://matmissionen.se/for-medlemmar/bli-medlem/" target="_blank" rel="noopener">
+                        <span>Bli medlem i Matmissionen</span>
+                      </a>
+                    `
+                    : ''
+                }
             </div>
 
             ${
