@@ -1270,9 +1270,6 @@ figure.close-location img {
   div#single-post-header {
     padding: 0px !important;
     max-width: 100%;
-    position: sticky;
-    top: 0;
-    z-index: 999;
   }
   div#category-posts,
   div#single-posts {
@@ -1588,6 +1585,13 @@ p:empty {
 
 .service_cat {
   margin-bottom: 20px !important;
+}
+
+div#category-header,
+div#single-post-header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
 }
 
 /* =========================
